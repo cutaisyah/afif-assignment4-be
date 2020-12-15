@@ -1,0 +1,28 @@
+{
+  "name": "assignment4",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "dependencies": {
+    "bcrypt": "^5.0.0",
+    "bruteforce": "0.0.2",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "express-jwt": "^6.0.0",
+    "express-validator": "^6.7.0",
+    "formidable": "^1.2.2",
+    "fs": "^0.0.1-security",
+    "jquery-bracket": "^0.11.1",
+    "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.20",
+    "mailgun-js": "^0.22.0",
+    "mongoose": "^5.11.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
