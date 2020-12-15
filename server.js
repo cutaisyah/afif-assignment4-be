@@ -4,6 +4,7 @@ const mongooseConnection = require ("./configs/mongoose.config");
 const routes = require ("./routes")
 const app = express();
 const port = normalizePort(process.env.PORT || "8080")
+const http = require('http');
 
 var corsOptions = {origin: "http://localhost:4200"};
 app.use(cors(corsOptions));
