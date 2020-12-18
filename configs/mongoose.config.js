@@ -23,7 +23,7 @@ const mongooseConnect = () => {
     })
     .then(() => {
       console.log("Successfully connect to MongoDB.");
-      initial();
+      // initial();
     })
     .catch((err) => {
       console.error("Connection error", err);
