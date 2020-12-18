@@ -1,17 +1,6 @@
-const express = require ("express");
-const cors = require ("cors");
-const mongooseConnection = require ("./configs/mongoose.config");
-const routes = require ("./routes")
-const app = express();
-const port = normalizePort(process.env.PORT || "8080")
+const app = require("./app");
+const debug = require("debug")("node-angular");
 const http = require('http');
-
-var corsOptions = {origin: "http://localhost:4200"};
-app.use(cors(corsOptions));
-mongooseConnection();
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(routes);
 
 const normalizePort = val => {
     var port = parseInt(val, 10);
@@ -54,13 +43,10 @@ const normalizePort = val => {
     debug("Listening on " + bind);
   };
 
-
+const port = normalizePort(process.env.PORT || "8080")
 app.set("port", port);
+
 const server = http.createServer(app);
 server.on("error", onError);
 server.on("listening", onListening);
 server.listen(port);
-
-server.listen(port, ()=>{
-    console.log(`App runs on http://localhost:${port}`);
-});
