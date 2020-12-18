@@ -14,21 +14,35 @@ const mongooseConnect = () => {
   const dburl = `mongodb://localhost/Database_Assignment4_Tournament`;
   //   mongoose
   //     .connect(`mongodb://${dbConfig.HOST}:${dbConfig.PORT}/${dbConfig.DB}`, {
-  mongoose
-    .connect(dburl, {
-      useCreateIndex: true,
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      useFindAndModify: false,
-    })
-    .then(() => {
-      console.log("Successfully connect to MongoDB.");
-      // initial();
-    })
-    .catch((err) => {
-      console.error("Connection error", err);
-      process.exit();
-    });
+  const connectionOptions = {
+    useCreateIndex: true,
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false,
+  };
+  mongoose.connect(dburl, connectionOptions);
+
+  const db = mongoose.connection;
+
+  db.on("error", console.error.bind(console, "Connection Error:"));
+  db.once("open", () => {
+    console.log(`Mongoose Connected!`);
+  });
+  // mongoose
+  //   .connect(dburl, {
+  //     useCreateIndex: true,
+  //     useNewUrlParser: true,
+  //     useUnifiedTopology: true,
+  //     useFindAndModify: false,
+  //   })
+  //   .then(() => {
+  //     console.log("Successfully connect to MongoDB.");
+  //     // initial();
+  //   })
+  //   .catch((err) => {
+  //     console.error("Connection error", err);
+  //     process.exit();
+  //   });
 
   const initial = () => {
     Role.estimatedDocumentCount((err, count) => {
