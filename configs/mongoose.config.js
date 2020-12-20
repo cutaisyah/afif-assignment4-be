@@ -4,7 +4,6 @@ const mongoose = require("mongoose");
 //   PORT: 27017,
 //   DB: "Database_Assignment4_Tournament",
 // };
-//test ubah
 const Role = require("../models/Role.model");
 const District = require("../models/District.model");
 const TournamentIsStarted = require("../models/TournamentIsStarted.model");
