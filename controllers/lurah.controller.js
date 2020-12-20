@@ -33,36 +33,68 @@ class lurahController {
     }
 
     static createPanitia (req,res, next){
+        // const {userId} = req.params.userId;
         const user = new User ({
             username: req.body.username,
             email: req.body.email,
             password: bcrypt.hashSync(req.body.password, 6),
             birthdate: req.body.birthdate,
-            phone: req.body.phone
+            phone: req.body.phone,
+            role_name: "panitia",
+            districts: req.userDistrict,
         });
-        var districtss,roless
+        // var districtss,roless
+        var districtss
+
+        // User.findById(req.userId)
+        //         .populate("districts")
+        //         .then(user => {
+        //             districtss = user.districts.district_name;
+        //             console.log(districtss);
+        //             user.save().then(userss=>{   
+        //                 userss.districts = districtss
+                        
+        //                 // userss.roles[0] = roless
+        //                 // console.log(userss.roles);
+        //                 res.status(201).json({ message: "Berhasil membuat panitia", userss });
+        //             })
+        //         }).catch(next);
+
         user.save((err,user)=>{
             if (err) {res.status(500).send({ message: err });return;}
-            if(req.body.roles && req.body.districts){
-                Role.findOne({role_name: "panitia"})
-                .then(role=>{
-                    user.roles = [role._id];
-                    roless = role.role_name;
-                });
-                District.findOne({district_name:req.body.districts})
-                .then(district=>{
-                    user.districts = district._id;
-                    districtss = district.district_name;
-                    user.save()
-                    .then(userss=>{   
-                        userss.districts[0] = districtss
-                        userss.roles[0] = roless
-                        console.log(userss.roles);
+            // if(req.body.roles && req.body.districts){
+                // Role.findOne({role_name: "panitia"})
+                // .then(role=>{
+                //     user.roles = [role._id];
+                //     roless = role.role_name;
+                // });
+                
+                User.findById(req.userId)
+                .populate("districts")
+                .then(user => {
+                    districtss = user.districts.district_name;
+                    // console.log(districtss);
+                    user.save().then(userss=>{   
+                        userss.districts = districtss
+                        // userss.roles[0] = roless
+                        // console.log(userss.roles);
                         res.status(201).json({ message: "Berhasil membuat panitia", userss });
                     })
                 })
+
+                // District.findOne({district_name:req.body.districts})
+                // .then(district=>{
+                //     user.districts = district._id;
+                //     districtss = district.district_name;
+                //     user.save().then(userss=>{   
+                //         userss.districts = districtss
+                //         // userss.roles[0] = roless
+                //         // console.log(userss.roles);
+                //         res.status(201).json({ message: "Berhasil membuat panitia", userss });
+                //     })
+                // })
                 .catch(next);
-            }
+            // }
         });
     }
 
