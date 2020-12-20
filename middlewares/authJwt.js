@@ -13,6 +13,7 @@ class authJwt {
         jwt.verify(token, "Assignment4", (err, decoded) => {
           if (err) {return res.status(401).send({ message: "Unauthorized!" });}
           req.userId = decoded.id;
+          req.userDistrict = decoded.districts;
           next();
         });
     };
@@ -24,17 +25,17 @@ class authJwt {
                 res.status(500).send({ message: err });
                 return;
             }
-            Role.find({_id:{$in: user.roles}}, (err,roles) => {
+            User.findOne({role_name:"panitia"}, (err,roles) => {
                 if(err){
                     res.status(500).send({ message: err });
                     return;
                 }
-                for (let i = 0; i < roles.length; i++){
-                    if(roles[i].role_name === "panitia"){
+                // for (let i = 0; i < roles.length; i++){
+                    if(roles.role_name === "panitia"){
                         next();
                         return;
                     }
-                }
+                // }
                 res.status(403).send({ message: "Hanya bisa diakses oleh panitia" });
                 return;
             });
@@ -48,17 +49,18 @@ class authJwt {
                 res.status(500).send({ message: err });
                 return;
             }
-            Role.find({_id:{$in: user.roles}}, (err,roles) => {
+            User.findOne({role_name:"lurah"}, (err,roles) => {
                 if(err){
                     res.status(500).send({ message: err });
                     return;
                 }
-                for (let i = 0; i < roles.length; i++){
-                    if(roles[i].role_name === "lurah"){
+                // for (let i = 0; i < roles.length; i++){
+                    
+                    if(roles.role_name === "lurah"){
                         next();
                         return;
                     }
-                }
+                // }
                 res.status(403).send({ message: "Hanya bisa diakses oleh lurah" });
                 return;
             });
@@ -72,17 +74,17 @@ class authJwt {
                 res.status(500).send({ message: err });
                 return;
             }
-            Role.find({_id:{$in: user.roles}}, (err,roles) => {
+            User.findOne({role_name:"admin"}, (err,roles) => {
                 if(err){
                     res.status(500).send({ message: err });
                     return;
                 }
-                for (let i = 0; i < roles.length; i++){
-                    if(roles[i].role_name === "admin"){
+                // for (let i = 0; i < roles.length; i++){
+                    if(roles.role_name === "admin"){
                         next();
                         return;
                     }
-                }
+                // }
                 res.status(403).send({ message: "Hanya bisa diakses oleh admin" });
                 return;
             });

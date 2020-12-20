@@ -18,7 +18,6 @@ class authController {
       username: req.body.username,
       email: req.body.email,
       password: bcrypt.hashSync(req.body.password, 8),
-    //   password: req.body.password,
       birthdate: req.body.birthdate,
       phone: req.body.phone,
       role_name: "peserta",
@@ -108,7 +107,7 @@ class authController {
               message: "Kombinasi username dan password tidak ditemukan",
             });
         }
-        var token = jwt.sign({ id: user.id }, "Assignment4", {
+        var token = jwt.sign({ id: user.id, districts: user.districts }, "Assignment4", {
           expiresIn: 86400,
         });
         // var authorities = [];
@@ -128,7 +127,7 @@ class authController {
           email: user.email,
           birthdate: user.birthdate,
           phone: user.phone,
-        //   roles: authorities,
+          roles: user.role_name,
           access_token: token,
           districts: districts,
         });
