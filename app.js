@@ -28,9 +28,9 @@ app.use((req, res, next) => {
   );
   next();
 });
-router.get("/", (req, res, next) => {
+// router.get("/", (req, res, next) => {
   
-});
+// });
 
 app.use(routes);
 

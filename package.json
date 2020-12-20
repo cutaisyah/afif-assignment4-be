@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "nodemon server.js"
   },
   "description": "",
   "main": "server.js",
@@ -20,7 +20,8 @@
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.20",
     "mailgun-js": "^0.22.0",
-    "mongoose": "^5.11.8"
+    "mongoose": "^5.11.8",
+    "nodemon": "^2.0.6"
   },
   "devDependencies": {},
   "engines": {
