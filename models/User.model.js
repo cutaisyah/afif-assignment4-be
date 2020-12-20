@@ -2,7 +2,7 @@ const { strict } = require("assert");
 const mongoose = require ("mongoose");
 
 const userSchema = new mongoose.Schema({
-  roles: [{type:  mongoose.Schema.Types.ObjectId, ref: "Role"}],
+  roles: {type:  mongoose.Schema.Types.ObjectId, ref: "Role"},
   username: String,
   email: String,
   password: String,
@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema({
   tournament_register: [{type: mongoose.Schema.Types.ObjectId, ref: "Tournament"}],
   tournament_blocked: [{type: mongoose.Schema.Types.ObjectId, ref: "Tournament"}],
   tournament_approved: [{type: mongoose.Schema.Types.ObjectId, ref: "TournamentApproved"}],
-  districts: [{type: String, ref: "District"}],
+  districts: {type: String, ref: "District"},
   teams: [{type: String, ref: "Team"}],
   
 });
