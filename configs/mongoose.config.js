@@ -11,7 +11,7 @@ const TournamentCategory = require("../models/TournamentCategory.model");
 
 const mongooseConnect = () => {
   //   const dburl = `mongodb+srv://belajarangular:belajarangular@cluster0.ful4b.mongodb.net/belajar1?retryWrites=true&w=majority`
-  const dburl = `mongodb://localhost/Database_Assignment4_Tournament`;
+  const dburl = `mongodb://localhost:27017/Database_Assignment4_Tournament`;
   //   mongoose
   //     .connect(`mongodb://${dbConfig.HOST}:${dbConfig.PORT}/${dbConfig.DB}`, {
   const connectionOptions = {
