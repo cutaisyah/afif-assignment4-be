@@ -1,6 +1,7 @@
 const routes = require ("express").Router();
 const panitiaController = require ("../controllers/panitia.controller");
 const authJwt = require ("../middlewares/authJwt");
+const verifyTournament = require("../middlewares/verifyTournament");
 
 routes.use((req,res,next)=>{
     res.header(
@@ -14,7 +15,7 @@ routes.use(authJwt.verifyToken, authJwt.isPanitia);
 routes.put("/update/:userId", panitiaController.updatePanitia);
 routes.get("/get/:userId", panitiaController.getPanitiaId);
 routes.get("/data-peserta", panitiaController.dataPeserta);
-routes.post("/create-tournament", panitiaController.createTournament);
+routes.post("/create-tournament", verifyTournament.checkDistrictandTournament, panitiaController.createTournament);
 routes.put("/edit-tournament", panitiaController.updateTournament);
 routes.get("/view-request", panitiaController.viewRequestPeserta);
 routes.put("/respon-request/:approvedId", panitiaController.responseRequestPeserta);

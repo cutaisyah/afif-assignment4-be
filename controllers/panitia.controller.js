@@ -102,7 +102,7 @@ class panitiaController {
         tournament_is_started: "pending",
         districts: req.userDistrict,
       });
-      console.log(fields);
+      // console.log(fields);
       if (files.image) {
         if (files.image.size > 1000000) {
           return res
