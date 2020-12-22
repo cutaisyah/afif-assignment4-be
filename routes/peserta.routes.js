@@ -12,7 +12,8 @@ routes.use((req,res,next)=>{
 });
 
 routes.use(authJwt.verifyToken);
-routes.put("/update/:userId", pesertaController.updatePeserta);
+routes.put("/update", pesertaController.updatePeserta);
+routes.put("/update-password", pesertaController.changePassword);
 routes.get("/get/:userId", pesertaController.getPesertaId);
 routes.post("/create-team", pesertaController.createTeam);
 routes.put("/register-team/:userId", pesertaController.registerTeam);

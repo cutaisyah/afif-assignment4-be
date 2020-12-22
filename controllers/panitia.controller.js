@@ -22,12 +22,10 @@ class panitiaController {
     }
     User.findByIdAndUpdate(userId, updatedData, { new: true })
       .then((panitia) => {
-        res
-          .status(200)
-          .json({
-            message: "Berhasil mengupdate data panitia",
-            updated: panitia,
-          });
+        res.status(200).json({
+          message: "Berhasil mengupdate data panitia",
+          updated: panitia,
+        });
       })
       .catch(next);
   }
@@ -49,12 +47,10 @@ class panitiaController {
     User.find({ roles: "5fcb009dbb23a6115cc6b3f8" })
       .populate("roles")
       .then((result) => {
-        res
-          .status(200)
-          .json({
-            message: "Berhasil mendapatkan list semua peserta",
-            data: result,
-          });
+        res.status(200).json({
+          message: "Berhasil mendapatkan list semua peserta",
+          data: result,
+        });
       })
       .catch(next);
   }
@@ -87,9 +83,7 @@ class panitiaController {
           .json({ message: "Form tidak boleh ada yang kosong" });
       }
       // const category = JSON.parse(fields.categories);
-    //   const district = JSON.parse(fields.districts);
-
-      
+      //   const district = JSON.parse(fields.districts);
 
       const tournament = new Tournament({
         tournament_name: fields.tournament_name,
@@ -114,6 +108,7 @@ class panitiaController {
       tournament.image.contentType = files.image.type;
 
       // var districtss,categoriess
+
       var districtss;
       tournament.save((err, tournament) => {
         if (err) {
@@ -188,12 +183,10 @@ class panitiaController {
   static viewRequestPeserta(req, res, next) {
     TournamentApproved.find()
       .then((approved) => {
-        res
-          .status(200)
-          .json({
-            message: "berhasil mendapat list request peserta",
-            approved,
-          });
+        res.status(200).json({
+          message: "berhasil mendapat list request peserta",
+          approved,
+        });
       })
       .catch(next);
   }
@@ -204,12 +197,10 @@ class panitiaController {
     const updatedData = { status };
     TournamentApproved.findByIdAndUpdate(approvedId, updatedData, { new: true })
       .then((panitia) => {
-        res
-          .status(200)
-          .json({
-            message: "Berhasil memberikan respon kepada peserta",
-            updated: panitia,
-          });
+        res.status(200).json({
+          message: "Berhasil memberikan respon kepada peserta",
+          updated: panitia,
+        });
       })
       .catch(next);
   }
@@ -264,12 +255,10 @@ class panitiaController {
             { third_winner: third.team_name },
             { upsert: true, returnOriginal: false }
           ).then((third) => {
-            res
-              .status(200)
-              .json({
-                message: "Berhasil menambahkan pemenang perlombaan",
-                third,
-              });
+            res.status(200).json({
+              message: "Berhasil menambahkan pemenang perlombaan",
+              third,
+            });
           });
         })
         .catch(next);

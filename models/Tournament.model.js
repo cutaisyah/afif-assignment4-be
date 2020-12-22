@@ -3,6 +3,7 @@ const mongoose = require ("mongoose");
 const tournamentsSchema = new mongoose.Schema({
     id_user_panitia: {type: mongoose.Schema.Types.ObjectId, ref: "User"},
     tournament_name: {type: String},
+    game: {type: String, ref: "Game"},
     image:{data:Buffer, contentType:String},
     total_participant: {type: Number, max: 100},
     age_minimum: {type: Number},

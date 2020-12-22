@@ -21,6 +21,7 @@ class authController {
       birthdate: req.body.birthdate,
       phone: req.body.phone,
       role_name: "peserta",
+      old_password: ""
     });
     // const token = jwt.sign({username: req.body.username,  email: req.body.email, password: bcrypt.hashSync(req.body.password, 8)}, "Assignment4", {expiresIn:"20m"});
     // const data = {
@@ -95,11 +96,19 @@ class authController {
           res.status(500).json({ message: err });
           return;
         }
+        if(user === null){
+          return res
+            .status(401)
+            .json({
+              access_token: null,
+              message: "Kombinasi username dan password tidak ditemukan",
+            });
+        }
         var passwordIsValid = bcrypt.compareSync(
           req.body.password,
           user.password
         );
-        if (!passwordIsValid && !user) {
+        if (!passwordIsValid) {
           return res
             .status(401)
             .json({
@@ -133,6 +142,17 @@ class authController {
         });
       });
   }
+
+  static getUserId (req,res,next){
+    console.log(req.userId)
+    User.findById(req.userId)
+    .populate("districts")
+    .then(result=>{
+      console.log(result);
+        res.status(200).json({message:'Berhasil mendapatkan data user', data:result});
+    })
+    .catch(next);
+}
 
   static forgotPassword(req, res) {
     const { email } = req.body;

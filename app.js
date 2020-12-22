@@ -3,6 +3,9 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const mongooseConnect = require("./configs/mongoose.config");
 const cors = require("cors");
+// const formidableMiddleware = require('express-formidable');
+// var multer = require('multer');
+// var upload = multer();
 
 const routes = require("./routes");
 
@@ -13,6 +16,7 @@ app.use(cors());
 mongooseConnect();
 
 app.use(bodyParser.json());
+// app.use(formidableMiddleware());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use("/images", express.static(path.join("images")));
 
