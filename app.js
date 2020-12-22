@@ -6,6 +6,7 @@ const cors = require("cors");
 // const formidableMiddleware = require('express-formidable');
 // var multer = require('multer');
 // var upload = multer();
+global.__basedir = __dirname
 
 const routes = require("./routes");
 

@@ -17,7 +17,7 @@ class verifyTournament{
   
     static checkDistrictandTournament (req, res, next) {
       // console.log(req.userId);
-              console.log(req.fields.tournament_name)
+              console.log(req.body.tournament_name)
       User.findById(req.userId)
       .populate("districts")
       .exec((err, user) =>{
@@ -31,7 +31,7 @@ class verifyTournament{
           .populate("districts")
           .then(result => {
             console.log(result);
-            Tournament.findOne({tournament_name: req.fields.tournament_name})
+            Tournament.findOne({tournament_name: req.body.tournament_name})
             .then( tournament => {
               if(result && tournament){
                 console.log(`result ${result.districts.district_name}`);

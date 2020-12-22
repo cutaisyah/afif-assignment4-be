@@ -1,6 +1,6 @@
 const User = require("../models/User.model");
-const formidable = require("formidable");
-const fs = require("fs");
+// const formidable = require("formidable");
+// const fs = require("fs");
 const Tournament = require("../models/Tournament.model");
 const Role = require("../models/Role.model");
 const District = require("../models/District.model");
@@ -56,99 +56,42 @@ class panitiaController {
   }
 
   static createTournament(req, res, next) {
-    let form = new formidable.IncomingForm();
-    form.keepExtensions = true;
-    form.parse(req, (err, fields, files) => {
+    const url = req.protocol + "://" + req.get("host");
+    const tournament = new Tournament({
+      tournament_name: req.body.tournament_name,
+      permalink: req.body.permalink,
+      categories: req.body.categories,
+      total_participant: req.body.total_participant,
+      age_minimum: req.body.age_minimum,
+      description: req.body.description,
+      id_user_panitia: req.userId,
+      image: url + "/images/" + req.file.filename,
+      tournament_is_started: "pending",
+      districts: req.userDistrict,
+    });
+
+    var districtss;
+    tournament.save((err, tournament) => {
       if (err) {
-        return res.status(400).json({ message: "Gambar tidak bisa diupload" });
+        res.status(500).send({ message: err });
+        return;
       }
-      const {
-        tournament_name,
-        permalink,
-        categories,
-        total_participant,
-        age_minimum,
-        description,
-      } = fields;
-      if (
-        !tournament_name ||
-        !total_participant ||
-        !age_minimum ||
-        !description ||
-        !permalink ||
-        !categories
-      ) {
-        return res
-          .status(400)
-          .json({ message: "Form tidak boleh ada yang kosong" });
-      }
-      // const category = JSON.parse(fields.categories);
-      //   const district = JSON.parse(fields.districts);
-
-      const tournament = new Tournament({
-        tournament_name: fields.tournament_name,
-        permalink: fields.permalink,
-        categories: fields.categories,
-        total_participant: fields.total_participant,
-        age_minimum: fields.age_minimum,
-        description: fields.description,
-        id_user_panitia: req.userId,
-        tournament_is_started: "pending",
-        districts: req.userDistrict,
-      });
-      // console.log(fields);
-      if (files.image) {
-        if (files.image.size > 1000000) {
-          return res
-            .status(400)
-            .json({ message: "Ukuran gambar terlalu besar" });
-        }
-      }
-      tournament.image.data = fs.readFileSync(files.image.path);
-      tournament.image.contentType = files.image.type;
-
-      // var districtss,categoriess
-
-      var districtss;
-      tournament.save((err, tournament) => {
-        if (err) {
-          res.status(500).send({ message: err });
-          return;
-        }
-        // if (category && district){
-        // TournamentCategory.find({category_name:{$in:category}})
-        // .then(category=>{
-        //     tournament.categories = category.map(category=>category._id);
-        //     categoriess = category.map(category=>category.category_name);
-        // });
-        User.findById(req.userId)
-          .populate("districts")
-          .then((user) => {
-            districtss = user.districts.district_name;
-            // console.log(districtss);
-            tournament.save().then((userss) => {
-              userss.districts = districtss;
-              // userss.roles[0] = roless
-              // console.log(userss.roles);
-              res
-                .status(201)
-                .json({ message: "Berhasil membuat turnament", userss });
-            });
-          })
-          // District.find({district_name:{$in:district}})
-          // .then(district=>{
-          //     tournament.districts = district.map(district=>district._id);
-          //     districtss = district.map(district=>district.district_name);
-          //     tournament.save()
-          //     .then(tournament=>{
-          //         tournament.categories = categoriess
-          //         tournament.districts = districtss
-          //         res.status(201).json({ message: "Tournament telah berhasil ditambahkan", tournament });
-          //     });
-          // })
-          .catch(next);
-        // }
-      });
+      User.findById(req.userId)
+        .populate("districts")
+        .then((user) => {
+          districtss = user.districts.district_name;
+          // console.log(districtss);
+          tournament.save().then((userss) => {
+            userss.districts = districtss;
+            // userss.roles[0] = roless
+            // console.log(userss.roles);
+            res
+              .status(201)
+              .json({ message: "Berhasil membuat turnament", userss });
+          });
+        })
+        .catch(next);
+      // }
     });
   }
 
