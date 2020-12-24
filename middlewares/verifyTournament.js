@@ -34,8 +34,7 @@ class verifyTournament {
             tournament.forEach((val) => {
               const checkGame = req.body.game === val.game.game_name;
               if (checkGame) {
-                return res.status(400).json({notification:"gagal"})
-                // throw new Error('Gagal pokoknya')
+                 throw new Error('Gagal pokoknya')
               }
               next();
             });
