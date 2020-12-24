@@ -9,6 +9,7 @@ const TournamentApproved = require("../models/TournamentApproved.model");
 const TournamentPrize = require("../models/TournamentPrize.model");
 const Team = require("../models/Team.model");
 const { result } = require("lodash");
+const Game = require("../models/Game.model");
 
 class panitiaController {
   static updatePanitia(req, res, next) {
@@ -57,43 +58,92 @@ class panitiaController {
 
   static createTournament(req, res, next) {
     const url = req.protocol + "://" + req.get("host");
-    const tournament = new Tournament({
-      tournament_name: req.body.tournament_name,
-      permalink: req.body.permalink,
-      categories: req.body.categories,
-      total_participant: req.body.total_participant,
-      age_minimum: req.body.age_minimum,
-      description: req.body.description,
-      id_user_panitia: req.userId,
-      image: url + "/images/" + req.file.filename,
-      tournament_is_started: "pending",
-      districts: req.userDistrict,
-    });
-
-    var districtss;
-    tournament.save((err, tournament) => {
-      if (err) {
-        res.status(500).send({ message: err });
-        return;
+    Game.findOne({game_name: req.body.game},(err,result)=>{
+      if(err){
+        res.status(500).json({message:err})
       }
-      User.findById(req.userId)
-        .populate("districts")
-        .then((user) => {
-          districtss = user.districts.district_name;
-          // console.log(districtss);
-          tournament.save().then((userss) => {
-            userss.districts = districtss;
-            // userss.roles[0] = roless
-            // console.log(userss.roles);
-            res
-              .status(201)
-              .json({ message: "Berhasil membuat turnament", userss });
-          });
-        })
-        .catch(next);
-      // }
-    });
+      // console.log(result);
+      const tournament = new Tournament({
+        tournament_name: req.body.tournament_name,
+        permalink: req.body.permalink,
+        categories: req.body.categories,
+        game: result, //renang 
+        total_participant: req.body.total_participant,
+        age_minimum: req.body.age_minimum,
+        description: req.body.description,
+        id_user_panitia: req.userId,
+        image: url + "/images/" + req.file.filename,
+        tournament_is_started: "pending",
+        districts: req.userDistrict,
+      });
+
+      tournament.save((err, tournament) => {
+        if (err) {
+          res.status(500).send({ message: err });
+          return;
+        }
+        User.findById(req.userId)
+          .populate("districts")
+          .then((user) => {
+            console.log("datauser", user);
+            res.status(201).json({ message: "Berhasil membuat turnament", user });
+          })
+          .catch(next);
+      });
+      
+    })
+    // const tournament = new Tournament({
+    //   tournament_name: req.body.tournament_name,
+    //   permalink: req.body.permalink,
+    //   categories: req.body.categories,
+    //   game: req.body.game, //renang 
+    //   total_participant: req.body.total_participant,
+    //   age_minimum: req.body.age_minimum,
+    //   description: req.body.description,
+    //   id_user_panitia: req.userId,
+    //   image: url + "/images/" + req.file.filename,
+    //   tournament_is_started: "pending",
+    //   districts: req.userDistrict,
+    // });
+
+    // var districtss;
+    // tournament.save((err, tournament) => {
+    //   if (err) {
+    //     res.status(500).send({ message: err });
+    //     return;
+    //   }
+    //   User.findById(req.userId)
+    //     .populate("districts")
+    //     .then((user) => {
+    //       console.log("datauser", user);
+    //       res.status(201).json({ message: "Berhasil membuat turnament", user });
+    //     })
+    //     .catch(next);
+    // });
   }
+
+  static getGameCategory(req, res, next){
+    let gameCategory;
+    Tournament.findOne({id_user_panitia: req.userId})
+    .then(user =>{
+      console.log(user);
+      gameCategory = user.game;
+      Game.findOne({game_name: gameCategory})
+      .then(game => {
+        console.log(game)
+        res.status(200).json({
+          msg: "bisa"
+        });
+      })
+      .catch(next);
+    })
+  }
+
+  //buat filter on game
+  // .find({game: "renang"})
+  //
+
+  //addcreategame
 
   static updateTournament(req, res, next) {
     const { tournamentId } = req.params;

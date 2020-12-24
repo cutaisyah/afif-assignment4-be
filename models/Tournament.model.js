@@ -3,7 +3,7 @@ const mongoose = require ("mongoose");
 const tournamentsSchema = new mongoose.Schema({
     id_user_panitia: {type: mongoose.Schema.Types.ObjectId, ref: "User"},
     tournament_name: {type: String, required: true},
-    game: {type: String, ref: "Game"},
+    game: {type: mongoose.Schema.Types.ObjectId, ref: "Game"},
     image:{type: String, required: true},
     total_participant: {type: Number, required: true, max: 100},
     age_minimum: {type: Number, required: true},
@@ -15,7 +15,7 @@ const tournamentsSchema = new mongoose.Schema({
     first_winner: {type: String, ref: "Team"},
     second_winner: {type: String, ref: "Team"},
     third_winner: {type: String, ref: "Team"},
-    districts: {type: String, ref: "District"},
+    districts: {type: mongoose.Schema.Types.ObjectId, ref: "District"},
 });
 
 const Tournament = mongoose.model("Tournament", tournamentsSchema);

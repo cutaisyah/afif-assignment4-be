@@ -29,6 +29,7 @@ class adminController {
       // });
       District.findOne({ district_name: req.body.districts })
         .then((district) => {
+          console.log(district);
           user.districts = district._id;
           districtss = district.district_name;
           user.save().then((userss) => {
