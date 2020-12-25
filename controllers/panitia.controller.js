@@ -62,7 +62,6 @@ class panitiaController {
       if(err){
         res.status(500).json({message:err})
       }
-      // console.log(result);
       const tournament = new Tournament({
         tournament_name: req.body.tournament_name,
         permalink: req.body.permalink,
@@ -72,11 +71,11 @@ class panitiaController {
         age_minimum: req.body.age_minimum,
         description: req.body.description,
         id_user_panitia: req.userId,
-        image: url + "/images/" + req.file.filename,
+        image: url + "/images/" + req.file.originalname,
         tournament_is_started: "pending",
         districts: req.userDistrict,
       });
-
+      
       tournament.save((err, tournament) => {
         if (err) {
           res.status(500).send({ message: err });
@@ -85,7 +84,6 @@ class panitiaController {
         User.findById(req.userId)
           .populate("districts")
           .then((user) => {
-            console.log("datauser", user);
             res.status(201).json({ message: "Berhasil membuat turnament", user });
           })
           .catch(next);

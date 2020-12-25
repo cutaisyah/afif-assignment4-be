@@ -3,7 +3,7 @@ const mongoose = require ("mongoose");
 const tournamentsSchema = new mongoose.Schema({
     id_user_panitia: {type: mongoose.Schema.Types.ObjectId, ref: "User"},
     tournament_name: {type: String, required: true},
-    game: {type: mongoose.Schema.Types.ObjectId, ref: "Game"},
+    game: {type: String, ref: "Game"},
     image:{type: String, required: true},
     total_participant: {type: Number, required: true, max: 100},
     age_minimum: {type: Number, required: true},

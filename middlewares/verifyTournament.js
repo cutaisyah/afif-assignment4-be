@@ -1,5 +1,6 @@
 const { Error } = require("mongoose");
 const District = require("../models/District.model");
+const Game = require("../models/Game.model");
 const Tournament = require("../models/Tournament.model");
 const User = require("../models/User.model");
 
@@ -17,23 +18,18 @@ class verifyTournament {
     User.findById(req.userId)
       .populate("districts")
       .then((result) => {
-        //kalau tipe_game udah ada di kelurahan ini brrti ga bisa
-        //kalau tipe_game belum ada di kelurahan ini brrti bisa
-        // district name yg ada di panitiaOn
-
-        // Tournament.find({districts: result.districts.district_name})
-
-        //tournament.game && tournament.districts
-        // console.log(result.districts._id);
+      
         Tournament.find({ districts: result.districts._id })
           // Tournament.find({districts: result.districts._id, game: req.body.game})
           .populate("districts")
           .populate("game")
           .then((tournament) => {
-            // console.log("tournament", tournament);
+            console.log("tournament", tournament);
+            
             tournament.forEach((val) => {
               const checkGame = req.body.game === val.game.game_name;
               if (checkGame) {
+                console.log("game", checkGame);
                  throw new Error('Gagal pokoknya')
               }
               next();
@@ -127,6 +123,48 @@ class verifyTournament {
   //     next();
   //   });
   // }
+  static verifyDistric (req,res){
+    const distric = req.userDistrict
+    const _id = req.userId
+    const {tournament_name, total_participant, age_minimum, description, categories, permalink, game} = req.body 
+    const tournament = new Tournament({  
+      tournament_name:tournament_name, 
+      total_participant:total_participant, 
+      age_minimum:age_minimum, 
+      description:description, 
+      categories:categories, 
+      permalink:permalink, 
+      game:game,
+      image: req.file.originalname,
+      districts: distric._id
+    })
+    Tournament.find({$and:[{districts:distric._id},{tournament_name:tournament_name}]}).then(data=>{
+      if(data.length == 0){
+         tournament.save().then(result=>{
+           res.send({
+             success: true,
+             message : "berhasil"
+           })
+         })
+      } else {
+        Tournament.find({$and:[{districts:distric._id},{game:game}]}).then(game =>{
+          if(game.length == 0){
+            tournament.save().then(result=>{
+              res.send({
+                success: true,
+                message : "berhasil"
+              })
+            })
+          }else{
+            res.send({
+              success: false,
+              message : "Sudah ada"
+            })
+          }
+        })
+      }
+    })
+  }
 }
 
 module.exports = verifyTournament;
