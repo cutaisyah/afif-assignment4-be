@@ -126,24 +126,28 @@ class verifyTournament {
   static verifyDistrict (req,res){
     const distric = req.userDistrict
     const _id = req.userId
-    const {tournament_name, total_participant, age_minimum, description, categories, permalink, game} = req.body 
+    const {tournament_name, total_participant, age_minimum, description, categories, permalink,first_prize, second_prize, third_prize, game} = req.body 
     const tournament = new Tournament({  
       tournament_name:tournament_name, 
       total_participant:total_participant, 
       age_minimum:age_minimum, 
       description:description, 
       categories:categories, 
+      first_prize:first_prize,  
+      second_prize:second_prize,  
+      third_prize:third_prize, 
       permalink:permalink, 
       game:game,
       image: req.file.originalname,
-      districts: distric._id
+      districts: distric._id,
+      is_started:"pending"
     })
     Tournament.find({$and:[{districts:distric._id},{tournament_name:tournament_name}]}).then(data=>{
       if(data.length == 0){
          tournament.save().then(result=>{
            res.send({
+             message : "berhasil",
              success: true,
-             message : "berhasil"
            })
          })
       } else {
@@ -152,8 +156,8 @@ class verifyTournament {
             tournament.save().then(result=>{
               res.send({
                 success: true,
-                message : "berhasil"
               })
+              message : "berhasil"
             })
           }else{
             res.send({

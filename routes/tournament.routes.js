@@ -9,9 +9,11 @@ routes.use((req,res,next)=>{
     );
     next();
 });
-routes.use(authJwt.verifyToken);
+// routes.use(authJwt.verifyToken);
 routes.get('/image/:tournamentId', tournamentController.viewImageTournament);
 routes.get("/detail/:tournamentId", tournamentController.detailTournament);
+routes.get("/filter-game/:gameF", tournamentController.filterGame);
+routes.get("/filter-district/:districtsF", tournamentController.filterDistricts);
 routes.get("/all", tournamentController.tournamentAll);
 
 

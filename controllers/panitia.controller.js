@@ -146,27 +146,45 @@ class panitiaController {
   static updateTournament(req, res, next) {
     const { tournamentId } = req.params;
     const {
-      tournament_name,
-      total_participant,
-      age_minimum,
-      description,
+      description
     } = req.body;
     const updatedData = {
-      tournament_name,
-      total_participant,
-      age_minimum,
-      description,
+      description
     };
-    for (let key in updatedData) {
-      if (!updatedData[key]) {
-        delete updatedData[key];
-      }
-    }
+    // for (let key in updatedData) {
+    //   if (!updatedData[key]) {
+    //     delete updatedData[key];
+    //   }
+    // }
+
     Tournament.findByIdAndUpdate(tournamentId, updatedData, { new: true })
       .then((tournament) => {
         res
           .status(200)
           .json({ message: "Berhasil mengupdate tournament", tournament });
+      })
+      .catch(next);
+  }
+
+  static changeTournamentStatus(req, res, next) {
+    const { tournamentId } = req.params;
+    const {
+      is_started
+    } = req.body;
+    const updatedData = {
+      is_started
+    };
+    // for (let key in updatedData) {
+    //   if (!updatedData[key]) {
+    //     delete updatedData[key];
+    //   }
+    // }
+
+    Tournament.findByIdAndUpdate(tournamentId, updatedData, { new: true })
+      .then((tournament) => {
+        res
+          .status(200)
+          .json({ message: "Berhasil mengupdate status turnamen", tournament });
       })
       .catch(next);
   }

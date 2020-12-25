@@ -25,9 +25,11 @@ class tournamentController {
     }
 
     static async tournamentAll (req,res,next){
-        const {page = 1, limit = 4, q = ''} = req.query;
+        console.log("coba");
+        const {page = 1, limit = 10, q = ''} = req.query;
         try {
             const tournament = await Tournament.find({ tournament_name: { '$regex': q, '$options': 'i' } })
+                .sort({tournament_name:1})
                 .limit(limit * 1)
                 .skip((page - 1) * limit)
                 .exec()
@@ -53,6 +55,29 @@ class tournamentController {
             res.status(200).json({tournament, page:page, totalpage:jumlahPage, nextpages:npg, previouspages:ppg});
         }
         catch(error){console.log(error.message)}
+    }
+
+    static filterGame(req,res,next){
+        const {gameF} = req.params;
+        console.log("gameF",gameF)
+        Tournament.find({game:gameF})
+        .then((result)=>{
+            console.log(result)
+            res.status(200).json({message:result})
+        })
+        .catch(next)
+    }
+
+    static filterDistricts(req,res,next){
+        const {districtsF} = req.params;
+        console.log("districtsF",typeof(districtsF))
+        Tournament.find({districts:districtsF})
+        .populate("districts")
+        .then((result)=>{
+            console.log(result)
+            res.status(200).json({message:result})
+        })
+        .catch(next)
     }
 }
 
