@@ -16,7 +16,7 @@ routes.use(authJwt.verifyToken, authJwt.isPanitia);
 routes.put("/update/:userId", panitiaController.updatePanitia);
 routes.get("/get/:userId", panitiaController.getPanitiaId);
 routes.get("/data-peserta", panitiaController.dataPeserta);
-routes.post("/create-tournament", extractFile,verifyTournament.verifyDistric, panitiaController.createTournament);
+routes.post("/create-tournament", extractFile, verifyTournament.verifyDistrict, panitiaController.createTournament);
 routes.put("/edit-tournament/:tournamentId", panitiaController.updateTournament);
 routes.put("/edit-status-tournament/:tournamentId", panitiaController.changeTournamentStatus);
 routes.get("/get-game", panitiaController.getGameCategory);
