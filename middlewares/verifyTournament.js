@@ -123,7 +123,7 @@ class verifyTournament {
   //     next();
   //   });
   // }
-  static verifyDistric (req,res){
+  static verifyDistrict (req,res){
     const distric = req.userDistrict
     const _id = req.userId
     const {tournament_name, total_participant, age_minimum, description, categories, permalink, game} = req.body 
