@@ -29,6 +29,7 @@ class tournamentController {
         const {page = 1, limit = 10, q = ''} = req.query;
         try {
             const tournament = await Tournament.find({ tournament_name: { '$regex': q, '$options': 'i' } })
+                .sort({tournament_name:1})
                 .limit(limit * 1)
                 .skip((page - 1) * limit)
                 .exec()
