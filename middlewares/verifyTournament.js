@@ -124,12 +124,14 @@ class verifyTournament {
   //   });
   // }
   static verifyDistrict (req,res){
-    const distric = req.userDistrict
-    const _id = req.userId
-    const {tournament_name, total_participant, age_minimum, description, categories, permalink,first_prize, second_prize, third_prize, game} = req.body 
+    const distric = req.userDistrict;
+    const _id = req.userId;
+    const url = req.protocol + "://" + req.get("host");
+    const {tournament_name, register_total_participant, max_total_participant, age_minimum, description, categories, permalink,first_prize, second_prize, third_prize, game} = req.body 
     const tournament = new Tournament({  
       tournament_name:tournament_name, 
-      total_participant:total_participant, 
+      register_total_participant: 0,
+      max_total_participant: max_total_participant, 
       age_minimum:age_minimum, 
       description:description, 
       categories:categories, 
@@ -138,26 +140,29 @@ class verifyTournament {
       third_prize:third_prize, 
       permalink:permalink, 
       game:game,
-      image: req.file.originalname,
+      image: url + "/images/" +req.file.originalname,
       districts: distric._id,
       is_started:"pending"
     })
-    Tournament.find({$and:[{districts:distric._id},{tournament_name:tournament_name}]}).then(data=>{
+    Tournament.find({$and:[{districts:distric._id},{tournament_name:tournament_name}]})
+    .then(data=>{
       if(data.length == 0){
-         tournament.save().then(result=>{
+         tournament.save()
+         .then(result=>{
            res.send({
              message : "berhasil",
              success: true,
            })
          })
       } else {
-        Tournament.find({$and:[{districts:distric._id},{game:game}]}).then(game =>{
+        Tournament.find({$and:[{districts:distric._id},{game:game}]})
+        .then(game =>{
           if(game.length == 0){
             tournament.save().then(result=>{
               res.send({
                 success: true,
+                message : "berhasil"
               })
-              message : "berhasil"
             })
           }else{
             res.send({
