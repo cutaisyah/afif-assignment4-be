@@ -171,9 +171,14 @@ class pesertaController {
         User.findById(req.userId)
         .populate("districts")
         .then(user => {
-          // console.log(user);
-          // console.log(tournament)
-          if(user.tournament_register !== null){
+          let ageDifMs = Date.now() - user.birthdate.getTime();
+          let ageDate = new Date(ageDifMs); // miliseconds from epoch
+          const userAge = Math.abs(ageDate.getUTCFullYear() - 1970);
+          console.log(userAge);
+          if(userAge < tournament.age_minimum){
+            res.status(400).json({success: false, message : "Peserta dibawah umur ketentuan"})
+          }
+          else if(user.tournament_register !== null){
             res.status(400).json({success: false, message : "Peserta Sudah Pernah Terdaftar"})
           } else {
             user.tournament_register = tournamentId;
