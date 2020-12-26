@@ -6,7 +6,7 @@ const validator = require("validator");
 const userSchema = new mongoose.Schema({
   // roles: {type:  mongoose.Schema.Types.ObjectId, ref: "Role"},
   role_name: { type: String, enum: ["admin", "lurah", "panitia", "peserta"] },
-  username: String,
+  username: {type: String, unique: true, required: true},
   email: {
     type: String,
     trim: true,
@@ -40,10 +40,10 @@ const userSchema = new mongoose.Schema({
       },
   },
   status: {type:Boolean},
-  tournament_register: {type: mongoose.Schema.Types.ObjectId, ref: "Tournament"},
-  tournament_approved: {type: mongoose.Schema.Types.ObjectId, ref: "TournamentApproved"}, 
+  tournament_register: {type: mongoose.Schema.Types.ObjectId, ref: "Tournament", default: null},
+  tournament_approved: {type: mongoose.Schema.Types.ObjectId, ref: "Tournament", default: null}, 
   districts: {type: String, ref: "District"},
-  teams: {type: String, ref: "Team"},
+  teams: {type: mongoose.Schema.Types.ObjectId, ref: "Team", default: null},
   
 });
 
