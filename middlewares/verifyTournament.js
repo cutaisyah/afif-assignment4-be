@@ -127,45 +127,54 @@ class verifyTournament {
     const distric = req.userDistrict;
     const _id = req.userId;
     const url = req.protocol + "://" + req.get("host");
-    const {tournament_name, register_total_participant, max_total_participant, age_minimum, description, categories, permalink,first_prize, second_prize, third_prize, game} = req.body 
-    const tournament = new Tournament({  
+    const {tournament_name, max_total_participant, age_minimum, description, categories, permalink,first_prize, second_prize, third_prize, game} = req.body 
+    const tournament = new Tournament({
+      id_user_panitia: req.userDistrict,
       tournament_name:tournament_name, 
       register_total_participant: 0,
       max_total_participant: max_total_participant, 
       age_minimum:age_minimum, 
-      description:description, 
+      description: description, 
       categories:categories, 
       first_prize:first_prize,  
       second_prize:second_prize,  
-      third_prize:third_prize, 
-      permalink:permalink, 
-      game:game,
-      image: url + "/images/" +req.file.originalname,
+      third_prize: third_prize, 
+      permalink: permalink, 
+      game: game,
+      image: url + "/image/" + req.file.filename,
       districts: distric._id,
       is_started:"pending"
     })
+    console.log(description);
     Tournament.find({$and:[{districts:distric._id},{tournament_name:tournament_name}]})
     .then(data=>{
       if(data.length == 0){
          tournament.save()
          .then(result=>{
-           res.send({
+           res.status(200).json({
              message : "berhasil",
              success: true,
+             data: result,
            })
          })
+        }else if(tournament_name == data.tournament_name){
+          res.status(400).json({
+            success: false,
+            message : "Sudah ada"
+          })
       } else {
         Tournament.find({$and:[{districts:distric._id},{game:game}]})
         .then(game =>{
           if(game.length == 0){
             tournament.save().then(result=>{
-              res.send({
+              res.status(200).json({
                 success: true,
-                message : "berhasil"
+                message : "berhasil",
+                data: result,
               })
             })
           }else{
-            res.send({
+            res.status(400).json({
               success: false,
               message : "Sudah ada"
             })
