@@ -113,7 +113,11 @@ class authController {
           });
         }
         var token = jwt.sign(
-          { id: user.id, districts: user.districts },
+          {
+            id: user.id,
+            roles: user.role_name,
+            districts: user.districts
+          },
           "Assignment4",
           {
             expiresIn: 86400,
