@@ -115,6 +115,9 @@ class authController {
         var token = jwt.sign(
           {
             id: user.id,
+            username: user.username,
+            email: user.email,
+            teams: user.teams,
             roles: user.role_name,
             districts: user.districts
           },
