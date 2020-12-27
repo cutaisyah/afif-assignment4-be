@@ -238,7 +238,9 @@ class pesertaController {
         .then((leader) => {
           console.log(leader.teams)
           if(leader.teams == null){
-            res.status(400).json({ message: "Please Create Team First!" });
+            res.status(400).json({ message: "Buat Team Terlebih dahulu!" });
+          } else if(leader.tournament_register !== member.tournament_register){
+            res.status(400).json({ message: "Member ini belum terdaftar di tournament yang sama" });
           } else {
           member.teams = leader.teams;
           member.save();
