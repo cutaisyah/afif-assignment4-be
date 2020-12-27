@@ -56,17 +56,28 @@ class panitiaController {
       .catch(next);
   }
 
+  static createGame(req, res, next) {
+    const { game_name } = req.body;
+    Game.create({ game_name })
+      .then((game) => {
+        res
+          .status(201)
+          .json({ message: "District berhasil ditambahkan", game });
+      })
+      .catch(next);
+  }
+
   static createTournament(req, res, next) {
     const url = req.protocol + "://" + req.get("host");
-    Game.findOne({game_name: req.body.game},(err,result)=>{
-      if(err){
-        res.status(500).json({message:err})
+    Game.findOne({ game_name: req.body.game }, (err, result) => {
+      if (err) {
+        res.status(500).json({ message: err });
       }
       const tournament = new Tournament({
         tournament_name: req.body.tournament_name,
         permalink: req.body.permalink,
         categories: req.body.categories,
-        game: result, //renang 
+        game: result, //renang
         total_participant: req.body.total_participant,
         age_minimum: req.body.age_minimum,
         description: req.body.description,
@@ -75,7 +86,7 @@ class panitiaController {
         tournament_is_started: "pending",
         districts: req.userDistrict,
       });
-      
+
       tournament.save((err, tournament) => {
         if (err) {
           res.status(500).send({ message: err });
@@ -84,78 +95,74 @@ class panitiaController {
         User.findById(req.userId)
           .populate("districts")
           .then((user) => {
-            res.status(201).json({ message: "Berhasil membuat turnament", user });
+            res
+              .status(201)
+              .json({ message: "Berhasil membuat turnament", user });
           })
           .catch(next);
       });
-      
-    })
-    // const tournament = new Tournament({
-    //   tournament_name: req.body.tournament_name,
-    //   permalink: req.body.permalink,
-    //   categories: req.body.categories,
-    //   game: req.body.game, //renang 
-    //   total_participant: req.body.total_participant,
-    //   age_minimum: req.body.age_minimum,
-    //   description: req.body.description,
-    //   id_user_panitia: req.userId,
-    //   image: url + "/images/" + req.file.filename,
-    //   tournament_is_started: "pending",
-    //   districts: req.userDistrict,
-    // });
-
-    // var districtss;
-    // tournament.save((err, tournament) => {
-    //   if (err) {
-    //     res.status(500).send({ message: err });
-    //     return;
-    //   }
-    //   User.findById(req.userId)
-    //     .populate("districts")
-    //     .then((user) => {
-    //       console.log("datauser", user);
-    //       res.status(201).json({ message: "Berhasil membuat turnament", user });
-    //     })
-    //     .catch(next);
-    // });
+    });
   }
 
-  static getGameCategory(req, res, next){
+  static getGameCategory(req, res, next) {
     let gameCategory;
-    Tournament.findOne({id_user_panitia: req.userId})
-    .then(user =>{
+    Tournament.findOne({ id_user_panitia: req.userId }).then((user) => {
       console.log(user);
       gameCategory = user.game;
-      Game.findOne({game_name: gameCategory})
-      .then(game => {
-        console.log(game)
-        res.status(200).json({
-          msg: "bisa"
-        });
-      })
-      .catch(next);
-    })
+      Game.findOne({ game_name: gameCategory })
+        .then((game) => {
+          console.log(game);
+          res.status(200).json({
+            msg: "bisa",
+          });
+        })
+        .catch(next);
+    });
   }
 
-  //buat filter on game
-  // .find({game: "renang"})
-  //
+  static findTournamentBasedOnGame(req, res, next) {
+    const { game } = req.params;
+    Tournament.find({ game })
+      .then((game) => {
+        if(game.length == 0){
+          res.status(400).json({ msg: "Game not Found!" });
+        } else {
+          res.status(200).json({ msg: "Game Found!", game: game });
+        }
+      })
+      .catch(next);
+  }
 
-  //addcreategame
+  static findTournamentBasedOnId(req, res, next) {
+    const { tournamentId } = req.params;
+    Tournament.findById( tournamentId )
+      .then((tournament) => {
+        if(tournament.length == 0){
+          res.status(400).json({ msg: "Game not Found!" });
+        } else {
+          res.status(200).json({ msg: "Game Found!", tournament: tournament });
+        }
+      })
+      .catch(next);
+  }
 
   static updateTournament(req, res, next) {
     const { tournamentId } = req.params;
-    const {
-      description
-    } = req.body;
+    const { max_total_participant, age_minimum, categories, description, first_prize, second_prize, third_prize } = req.body;
     const updatedData = {
-      description
+      description,
+      max_total_participant,
+      age_minimum,
+      categories,
+      first_prize,
+      second_prize,
+      third_prize 
     };
-    // for (let key in updatedData) {
-    //   if (!updatedData[key]) {
-    //     delete updatedData[key];
-    //   }
-    // }
+    for (let key in updatedData) {
+      if (!updatedData[key]) {
+        delete updatedData[key];
+      }
+    }
 
     Tournament.findByIdAndUpdate(tournamentId, updatedData, { new: true })
       .then((tournament) => {
@@ -166,28 +173,57 @@ class panitiaController {
       .catch(next);
   }
 
-  static changeTournamentStatus(req, res, next) {
+  static changeTournamentStatusOngoing(req, res, next) {
     const { tournamentId } = req.params;
-    const {
-      is_started
-    } = req.body;
-    const updatedData = {
-      is_started
-    };
-    // for (let key in updatedData) {
-    //   if (!updatedData[key]) {
-    //     delete updatedData[key];
-    //   }
-    // }
-
-    Tournament.findByIdAndUpdate(tournamentId, updatedData, { new: true })
+    Tournament.findByIdAndUpdate(tournamentId, {is_started: "ongoing"}, { new: true })
       .then((tournament) => {
-        res
-          .status(200)
-          .json({ message: "Berhasil mengupdate status turnamen", tournament });
+        res.status(200).json({ message: "Berhasil mengupdate status turnamen", tournament });
       })
       .catch(next);
   }
+
+  static changeTournamentStatusCompleted(req, res, next) {
+    const { tournamentId } = req.params;
+    Tournament.findByIdAndUpdate(tournamentId, {is_started: "completed"}, { new: true })
+      .then((tournament) => {
+        res.status(200).json({ message: "Berhasil mengupdate status turnamen", tournament });
+      })
+      .catch(next);
+  }
+
+  static async tournamentAllDistrict (req,res,next){
+    console.log("coba");
+    const {page = 1, limit = 10, q = ''} = req.query;
+    try {
+        const tournament = await Tournament.find({ tournament_name: { '$regex': q, '$options': 'i' }, districts: req.userDistrict })
+            .sort({tournament_name:1})
+            .populate("districts")
+            .limit(limit * 1)
+            .skip((page - 1) * limit)
+            .exec()
+        console.log(tournament);
+        const nextpage = parseInt(page) + parseInt('1')
+        const previouspage = parseInt(page) - parseInt('1')
+        const jumlahData = await Tournament.countDocuments({ tournament_name: { '$regex': q, '$options': 'i' } })
+        const jumlahPage = Math.ceil(jumlahData / limit)
+        var npg, ppg
+        if(parseInt(page) === parseInt(jumlahPage) && parseInt(page) === 1){
+            npg = null
+            ppg = null
+        } else if(parseInt(page) === parseInt(jumlahPage)){
+            ppg = 'http://localhost:8080/tournament/all?page=' + previouspage
+            npg = null
+        } else if(parseInt(page) === 1){
+            npg = 'http://localhost:8080/tournament/all?page=' + nextpage
+            ppg = null
+        } else {
+            npg = 'http://localhost:8080/tournament/all?page=' + nextpage
+            ppg = 'http://localhost:8080/tournament/all?page=' + previouspage
+        }
+        res.status(200).json({tournament, page:page, totalpage:jumlahPage, nextpages:npg, previouspages:ppg});
+    }
+    catch(error){console.log(error.message)}
+}
 
   static viewRequestPeserta(req, res, next) {
     TournamentApproved.find()
