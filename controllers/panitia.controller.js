@@ -83,7 +83,7 @@ class panitiaController {
         age_minimum: req.body.age_minimum,
         description: req.body.description,
         id_user_panitia: req.userId,
-        image: url + "/images/" + req.file.originalname,
+        image: url + "/image/" + req.file.originalname,
         tournament_is_started: "pending",
         districts: req.userDistrict,
       });
@@ -212,6 +212,7 @@ class panitiaController {
   static async tournamentAllDistrict (req,res,next){
     console.log("coba");
     const {page = 1, limit = 10, q = ''} = req.query;
+    const url_local = "http://localhost:3000";
     try {
         const tournament = await Tournament.find({ tournament_name: { '$regex': q, '$options': 'i' }, districts: req.userDistrict })
             .sort({tournament_name:1})
@@ -229,14 +230,14 @@ class panitiaController {
             npg = null
             ppg = null
         } else if(parseInt(page) === parseInt(jumlahPage)){
-            ppg = 'http://localhost:8080/tournament/all?page=' + previouspage
+            ppg = url_local + '/tournament/all?page=' + previouspage
             npg = null
         } else if(parseInt(page) === 1){
-            npg = 'http://localhost:8080/tournament/all?page=' + nextpage
+            npg = url_local + '/tournament/all?page=' + nextpage
             ppg = null
         } else {
-            npg = 'http://localhost:8080/tournament/all?page=' + nextpage
-            ppg = 'http://localhost:8080/tournament/all?page=' + previouspage
+            npg = url_local + '/tournament/all?page=' + nextpage
+            ppg = url_local + '/tournament/all?page=' + previouspage
         }
         res.status(200).json({tournament, page:page, totalpage:jumlahPage, nextpages:npg, previouspages:ppg});
     }

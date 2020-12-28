@@ -27,6 +27,7 @@ class tournamentController {
     static async tournamentAll (req,res,next){
         console.log("coba");
         const {page = 1, limit = 10, q = ''} = req.query;
+        const url_local = "http://localhost:3000";
         try {
             const tournament = await Tournament.find({ tournament_name: { '$regex': q, '$options': 'i' } })
                 .sort({tournament_name:1})
@@ -44,14 +45,14 @@ class tournamentController {
                 npg = null
                 ppg = null
             } else if(parseInt(page) === parseInt(jumlahPage)){
-                ppg = 'http://localhost:8080/tournament/all?page=' + previouspage
+                ppg = url_local + '/tournament/all?page=' + previouspage
                 npg = null
             } else if(parseInt(page) === 1){
-                npg = 'http://localhost:8080/tournament/all?page=' + nextpage
+                npg = url_local + '/tournament/all?page=' + nextpage
                 ppg = null
             } else {
-                npg = 'http://localhost:8080/tournament/all?page=' + nextpage
-                ppg = 'http://localhost:8080/tournament/all?page=' + previouspage
+                npg = url_local + '/tournament/all?page=' + nextpage
+                ppg = url_local + '/tournament/all?page=' + previouspage
             }
             res.status(200).json({tournament, page:page, totalpage:jumlahPage, nextpages:npg, previouspages:ppg});
         }
@@ -84,6 +85,7 @@ class tournamentController {
     static async filterTournamentPending(req,res,next){
         console.log("coba");
         const {page = 1, limit = 10, q = ''} = req.query;
+        const url_local = "http://localhost:3000";
         try {
             const tournament = await Tournament.find({is_started: "pending"})
                 .sort({tournament_name:1})
@@ -103,14 +105,14 @@ class tournamentController {
                 npg = null
                 ppg = null
             } else if(parseInt(page) === parseInt(jumlahPage)){
-                ppg = 'http://localhost:8080/tournament/all?page=' + previouspage
+                ppg = url_local+ '/tournament/all?page=' + previouspage
                 npg = null
             } else if(parseInt(page) === 1){
-                npg = 'http://localhost:8080/tournament/all?page=' + nextpage
+                npg = url_local+ '/tournament/all?page=' + nextpage
                 ppg = null
             } else {
-                npg = 'http://localhost:8080/tournament/all?page=' + nextpage
-                ppg = 'http://localhost:8080/tournament/all?page=' + previouspage
+                npg = url_local+ '/tournament/all?page=' + nextpage
+                ppg = url_local+ '/tournament/all?page=' + previouspage
             }
             res.status(200).json({tournament, page:page, totalpage:jumlahPage, nextpages:npg, previouspages:ppg});
         }
@@ -120,6 +122,7 @@ class tournamentController {
     static async filterTournamentOngoing(req,res,next){
         console.log("coba");
         const {page = 1, limit = 10, q = ''} = req.query;
+        const url_local = "http://localhost:3000";
         try {
             const tournament = await Tournament.find({is_started: "ongoing"})
                 .sort({tournament_name:1})
@@ -137,14 +140,14 @@ class tournamentController {
                 npg = null
                 ppg = null
             } else if(parseInt(page) === parseInt(jumlahPage)){
-                ppg = 'http://localhost:8080/tournament/all?page=' + previouspage
+                ppg = url_local +'/tournament/all?page=' + previouspage
                 npg = null
             } else if(parseInt(page) === 1){
-                npg = 'http://localhost:8080/tournament/all?page=' + nextpage
+                npg = url_local +'/tournament/all?page=' + nextpage
                 ppg = null
             } else {
-                npg = 'http://localhost:8080/tournament/all?page=' + nextpage
-                ppg = 'http://localhost:8080/tournament/all?page=' + previouspage
+                npg = url_local +'/tournament/all?page=' + nextpage
+                ppg = url_local +'/tournament/all?page=' + previouspage
             }
             res.status(200).json({tournament, page:page, totalpage:jumlahPage, nextpages:npg, previouspages:ppg});
         }
@@ -154,6 +157,7 @@ class tournamentController {
     static async filterTournamentCompleted(req,res,next){
         console.log("coba");
         const {page = 1, limit = 10, q = ''} = req.query;
+        const url_local = "http://localhost:3000";
         try {
             const tournament = await Tournament.find({is_started: "completed"})
                 .sort({tournament_name:1})
@@ -171,14 +175,14 @@ class tournamentController {
                 npg = null
                 ppg = null
             } else if(parseInt(page) === parseInt(jumlahPage)){
-                ppg = 'http://localhost:8080/tournament/all?page=' + previouspage
+                ppg = url_local +'/tournament/all?page=' + previouspage
                 npg = null
             } else if(parseInt(page) === 1){
-                npg = 'http://localhost:8080/tournament/all?page=' + nextpage
+                npg = url_local +'/tournament/all?page=' + nextpage
                 ppg = null
             } else {
-                npg = 'http://localhost:8080/tournament/all?page=' + nextpage
-                ppg = 'http://localhost:8080/tournament/all?page=' + previouspage
+                npg = url_local +'/tournament/all?page=' + nextpage
+                ppg = url_local +'/tournament/all?page=' + previouspage
             }
             res.status(200).json({tournament, page:page, totalpage:jumlahPage, nextpages:npg, previouspages:ppg});
         }
