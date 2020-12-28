@@ -47,7 +47,7 @@ class panitiaController {
   static getDataPesertaRegistered(req, res, next) {
     User.find({ role_name: "peserta", districts: req.userDistrict })
       .$where('this.tournament_register !== null')
-      .populate("roles")
+      .populate("roles").populate("districts").populate("tournament_approved")
       .then((result) => {
         res.status(200).json({
           message: "Berhasil mendapatkan list semua peserta",
@@ -191,6 +191,23 @@ class panitiaController {
       })
       .catch(next);
   }
+
+  static changeToApproved(req, res, next) {
+    const { userId } = req.params;
+    User.findById(userId)
+    .populate("tournament_approved")
+      .then((user) => {
+        if(user.tournament_register == null){
+          res.status(400).json({ msg: "user belum teregistrasi!" });
+        }
+        user.tournament_approved = user.tournament_register;
+        
+        user.save();
+        res.status(200).json({ message: "Berhasil mengupdate status menjadi Approved", user });
+      })
+      .catch(next);
+  }
+
 
   static async tournamentAllDistrict (req,res,next){
     console.log("coba");
