@@ -30,7 +30,7 @@ class authController {
     //     subject: 'Email Authenthication',
     //     html: `
     //         <h2>Silahkan klik link berikut ini untuk mengaktifkan akun anda</h2>
-    //         <p>http://localhost:3000/auth/activate/${token}</p>
+    //         <p>http://localhost:8080/auth/activate/${token}</p>
     //     `
     // };
     // mg.messages().send(data, function (error, body) {
@@ -178,7 +178,7 @@ class authController {
         subject: "Password Reset",
         html: `
                     <h2>Silahkan klik link berikut ini untuk mereset password anda</h2>
-                    <p>http://localhost:3000/auth/resetpassword/${token}</p>
+                    <p>http://localhost:8080/auth/resetpassword/${token}</p>
                 `,
       };
 

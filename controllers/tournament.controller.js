@@ -27,7 +27,7 @@ class tournamentController {
     static async tournamentAll (req,res,next){
         console.log("coba");
         const {page = 1, limit = 10, q = ''} = req.query;
-        const url_local = "http://localhost:3000";
+        const url_local = "http://localhost:8080";
         try {
             const tournament = await Tournament.find({ tournament_name: { '$regex': q, '$options': 'i' } })
                 .sort({tournament_name:1})
@@ -85,7 +85,7 @@ class tournamentController {
     static async filterTournamentPending(req,res,next){
         console.log("coba");
         const {page = 1, limit = 10, q = ''} = req.query;
-        const url_local = "http://localhost:3000";
+        const url_local = "http://localhost:8080";
         try {
             const tournament = await Tournament.find({is_started: "pending"})
                 .sort({tournament_name:1})
@@ -122,7 +122,7 @@ class tournamentController {
     static async filterTournamentOngoing(req,res,next){
         console.log("coba");
         const {page = 1, limit = 10, q = ''} = req.query;
-        const url_local = "http://localhost:3000";
+        const url_local = "http://localhost:8080";
         try {
             const tournament = await Tournament.find({is_started: "ongoing"})
                 .sort({tournament_name:1})
@@ -157,7 +157,7 @@ class tournamentController {
     static async filterTournamentCompleted(req,res,next){
         console.log("coba");
         const {page = 1, limit = 10, q = ''} = req.query;
-        const url_local = "http://localhost:3000";
+        const url_local = "http://localhost:8080";
         try {
             const tournament = await Tournament.find({is_started: "completed"})
                 .sort({tournament_name:1})
