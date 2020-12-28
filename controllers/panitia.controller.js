@@ -44,8 +44,8 @@ class panitiaController {
       .catch(next);
   }
 
-  static dataPeserta(req, res, next) {
-    User.find({ roles: "5fcb009dbb23a6115cc6b3f8" })
+  static getDataPeserta(req, res, next) {
+    User.find({ role_name: "peserta", districts: req.userDistrict })
       .populate("roles")
       .then((result) => {
         res.status(200).json({
