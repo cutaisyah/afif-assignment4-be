@@ -12,8 +12,12 @@ routes.use((req,res,next)=>{
 // routes.use(authJwt.verifyToken);
 routes.get('/image/:tournamentId', tournamentController.viewImageTournament);
 routes.get("/detail/:permalink", tournamentController.detailTournament);
+
 routes.get("/filter-game/:gameF", tournamentController.filterGame);
+routes.get("/getalldistrict", tournamentController.getAllDistrict)
+routes.get("/getallgame", tournamentController.getAllGame)
 routes.get("/filter-district/:districtsF", tournamentController.filterDistricts);
+
 routes.get("/all", tournamentController.getTournamentAll);
 routes.get("/pending", tournamentController.filterTournamentPending);
 routes.get("/ongoing", tournamentController.filterTournamentOngoing);

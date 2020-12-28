@@ -119,6 +119,7 @@ class authController {
             email: user.email,
             teams: user.teams,
             roles: user.role_name,
+            birthdate: user.birthdate,
             districts: user.districts
           },
           "Assignment4",

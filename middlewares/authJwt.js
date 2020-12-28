@@ -14,6 +14,7 @@ class authJwt {
           if (err) {return res.status(401).send({ message: "Unauthorized!" });}
           req.userId = decoded.id;
           req.userDistrict = decoded.districts;
+          req.userAge = decoded.birthdate;
           next();
         });
     };
