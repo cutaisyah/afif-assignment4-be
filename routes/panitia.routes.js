@@ -15,7 +15,7 @@ routes.use((req,res,next)=>{
 routes.use(authJwt.verifyToken, authJwt.isPanitia);
 routes.put("/update/:userId", panitiaController.updatePanitia);
 routes.get("/get/:userId", panitiaController.getPanitiaId);
-routes.get("/data-peserta", panitiaController.dataPeserta);
+routes.get("/data-peserta", panitiaController.getDataPeserta);
 
 routes.post("/create-game", panitiaController.createGame);
 routes.post("/create-tournament", extractFile, verifyTournament.verifyDistrict, panitiaController.createTournament);
