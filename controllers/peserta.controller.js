@@ -81,6 +81,7 @@ class pesertaController {
     User.findById(userId)
       .populate("roles")
       .populate("districts")
+      .populate("teams")
       .then((result) => {
         res
           .status(200)
@@ -94,20 +95,22 @@ class pesertaController {
     const team = new Team({ team_name, team_phone });
     User.findById(req.userId)
     .then(user => {
-      if(user.teams == null){
-        team
-        .save()
+      if(user.teams !== null){
+        res.status(400).json({ message: "Anda Sudah terdaftar dalam Team"});
+      } 
+      else{
+        team.save()
         .then((team) => {
-          User.findById(req.userId)
-          .then(user => {
             user.teams = team._id
-            user.save();
-            res.status(201).json({ message: "Peserta berhasil mendaftarkan team", data: team });
-          }).catch(next);
+            user.save(err=>{
+              if (err.name === 'MongoError' || err.code === 11000) {
+                return res.status(400).send({ succes: false, message: 'User already exist!' });
+              }
+              return res.status(400).send(err);
+            });
+            return res.status(201).json({ message: "Peserta berhasil mendaftarkan team", data: team });
         })
         .catch(next);
-      } else {
-        res.status(400).json({ message: "Sudah terdaftar dalam Team"});
       }
     })
     .catch(next);
@@ -115,27 +118,26 @@ class pesertaController {
 
 
 
-  static registerTeam(req, res, next) {
-    const { userId } = req.params;
-    const { teams } = req.body;
+  // static registerTeam(req, res, next) {
+  //   const { teams } = req.body;
 
-    User.findByIdAndUpdate(userId, { teams: teams })
-      .then((peserta) => {
-        if (req.body.teams) {
-          Team.find({ team_name: { $in: req.body.teams } }, (err, team) => {
-            if (err) {
-              res.status(500).send({ message: err });
-              return;
-            }
-            team.teams = teams.map((team) => team._id);
-          });
-        }
-        res
-          .status(200)
-          .json({ message: "Berhasil mendaftar pada team", peserta });
-      })
-      .catch(next);
-  }
+  //   User.findByIdAndUpdate(req.userId, { teams: teams })
+  //     .then((peserta) => {
+  //       if (req.body.teams) {
+  //         Team.find({ team_name: { $in: req.body.teams } }, (err, team) => {
+  //           if (err) {
+  //             res.status(500).send({ message: "Nama Team Sudah Ada" });
+  //             return;
+  //           }
+  //           team.teams = teams.map((team) => team._id);
+  //         });
+  //       }
+  //       res
+  //         .status(200)
+  //         .json({ message: "Berhasil mendaftar pada team", peserta });
+  //     })
+  //     .catch(next);
+  // }
 
   // static pesertaRegisterTournament(req, res, next) {
   //   const { userId } = req.params;
@@ -184,10 +186,10 @@ class pesertaController {
           else if(user.tournament_register !== null){
             console.log("Peserta Sudah Pernah Terdaftar")
             res.status(400).json({success: false, message : "Peserta Sudah Pernah Terdaftar"})
-          }else if(req.userRole == "admin" || req.userRole == "panitia" || req.userRole == "peserta" ){
+          }else if(req.userRole == "admin" || req.userRole == "panitia" || req.userRole == "lurah" ){
             res.status(400).json({success: false, message : "Hanya Peserta Yang Dapat Mendaftar"})
           } else {
-            user.tournament_register = tournamentId;
+            user.tournament_register = tournament._id;
             ++tournament.register_total_participant;
             user.save();
             tournament.save();
@@ -198,29 +200,29 @@ class pesertaController {
     }).catch(next);
   }
 
-  static teamRegisterTournament(req, res, next) {
-    const { teamId } = req.params;
-    const { tournament_name, status } = req.body;
-    Team.findById(teamId)
-      .then((team) => {
-        console.log(team);
-        const participant = team;
-        TournamentApproved.create(
-          { status, tournament_name, participant },
-          (err, approved) => {
-            if (err) {
-              res.status(500).json({ message: err });
-              return;
-            }
-            res.status(200).json({
-              message: "berhasil mendaftarkan tim ke tournament",
-              approved,
-            });
-          }
-        );
-      })
-      .catch(next);
-  }
+  // static teamRegisterTournament(req, res, next) {
+  //   const { teamId } = req.params;
+  //   const { tournament_name, status } = req.body;
+  //   Team.findById(teamId)
+  //     .then((team) => {
+  //       console.log(team);
+  //       const participant = team;
+  //       TournamentApproved.create(
+  //         { status, tournament_name, participant },
+  //         (err, approved) => {
+  //           if (err) {
+  //             res.status(500).json({ message: err });
+  //             return;
+  //           }
+  //           res.status(200).json({
+  //             message: "berhasil mendaftarkan tim ke tournament",
+  //             approved,
+  //           });
+  //         }
+  //       );
+  //     })
+  //     .catch(next);
+  // }
 
   static pesertaRegisterOtherPesertaToTeam(req, res, next){
     //user cari temen yang udah register ke turnament itu
@@ -232,7 +234,7 @@ class pesertaController {
     .then((member) => {
       // console.log(member);
       if(member == null){
-        res.status(400).json({ message: "saha eta?" });
+        res.status(400).json({ message: "username tidak ditemukan" });
       } else if(member.districts._id.toString() !== req.userDistrict._id){
         res.status(400).json({ message: "beda district" });
       } else if(member.teams !== null){
@@ -240,10 +242,11 @@ class pesertaController {
       } else{
         User.findById(req.userId)
         .then((leader) => {
-          console.log(leader.teams)
+          // console.log("leaderteams",leader.teams)
           if(leader.teams == null){
             res.status(400).json({ message: "Buat Team Terlebih dahulu!" });
-          } else if(leader.tournament_register !== member.tournament_register){
+          } else if(leader.tournament_register.toString() !== member.tournament_register.toString()){
+            console.log("Member ini belum terdaftar di tournament yang sama")
             res.status(400).json({ message: "Member ini belum terdaftar di tournament yang sama" });
           } else {
           member.teams = leader.teams;

@@ -16,6 +16,7 @@ class authJwt {
           req.userDistrict = decoded.districts;
           req.userRole = decoded.roles;
           req.userAge = decoded.birthdate;
+          req.userTeam = decoded.teams;
           next();
         });
     };

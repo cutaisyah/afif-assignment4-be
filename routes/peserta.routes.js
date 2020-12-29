@@ -16,9 +16,9 @@ routes.put("/update", pesertaController.updatePeserta);
 routes.put("/update-password", pesertaController.changePassword);
 routes.get("/get/:userId", pesertaController.getPesertaId);
 routes.post("/create-team", pesertaController.createTeam);
-routes.put("/register-team/:userId", pesertaController.registerTeam);
+// routes.put("/register-team/:userId", pesertaController.registerTeam);
 routes.put("/register-tournament/:permalink", pesertaController.pesertaRegisterTournament);
-routes.post('/team-register-tournament/:teamId', pesertaController.teamRegisterTournament);
-routes.post('/add-member', pesertaController.pesertaRegisterOtherPesertaToTeam);
+// routes.post('/team-register-tournament/:teamId', pesertaController.teamRegisterTournament);
+routes.put('/add-member', pesertaController.pesertaRegisterOtherPesertaToTeam);
 
 module.exports = routes;
