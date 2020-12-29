@@ -90,6 +90,27 @@ class pesertaController {
       .catch(next);
   }
 
+  static getTeamPeserta(req,res,next){
+    const { teamId } = req.params
+    console.log(teamId)
+    console.log("teamId",typeof(teamId))
+    Team.findById(teamId)
+    .exec((err,team)=>{
+      if(err){
+        res.status(500).json(err)
+      } else if (!team){
+        res.status(400).json("Tidak ada team")
+      } else {
+        User.find({teams:teamId})
+        .populate("teams")
+        .then((user)=> {
+          res.status(200).json(user)
+        })
+        .catch(next)
+      }
+    }) 
+  }
+
   static createTeam(req, res, next) {
     const { team_name, team_phone } = req.body;
     const team = new Team({ team_name, team_phone });
