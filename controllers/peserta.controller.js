@@ -158,14 +158,16 @@ class pesertaController {
   // }
 
   static pesertaRegisterTournament(req, res, next) {
-    const { tournamentId } = req.params;
+    const { permalink } = req.params;
     // console.log(tournamentId);
-    Tournament.findById(tournamentId)
+    Tournament.findOne({permalink: permalink})
     .populate("districts")
     .then(tournament => {
       if(tournament.register_total_participant >= tournament.max_total_participant ){
+        console.log("Sudah Penuh")
         res.status(400).json({success: false, message : "Sudah Penuh"})
       } else if(tournament.is_started == "ongoing" || tournament.is_started == "completed" ) {
+        console.log("Tournament Sudah Dimulai")
         res.status(400).json({success: false, message : "Tournament Sudah Dimulai"})
       } else {
         User.findById(req.userId)
@@ -174,12 +176,16 @@ class pesertaController {
           let ageDifMs = Date.now() - user.birthdate.getTime();
           let ageDate = new Date(ageDifMs); // miliseconds from epoch
           const userAge = Math.abs(ageDate.getUTCFullYear() - 1970);
-          console.log(userAge);
+          // console.log(userAge);
           if(userAge < tournament.age_minimum){
+            console.log("Peserta dibawah umur ketentuan")
             res.status(400).json({success: false, message : "Peserta dibawah umur ketentuan"})
           }
           else if(user.tournament_register !== null){
+            console.log("Peserta Sudah Pernah Terdaftar")
             res.status(400).json({success: false, message : "Peserta Sudah Pernah Terdaftar"})
+          }else if(req.userRole == "admin" || req.userRole == "panitia" || req.userRole == "peserta" ){
+            res.status(400).json({success: false, message : "Hanya Peserta Yang Dapat Mendaftar"})
           } else {
             user.tournament_register = tournamentId;
             ++tournament.register_total_participant;
@@ -189,9 +195,7 @@ class pesertaController {
           }
         })
       }
-    }).catch(err =>{
-      throw new Error("error");
-    });
+    }).catch(next);
   }
 
   static teamRegisterTournament(req, res, next) {

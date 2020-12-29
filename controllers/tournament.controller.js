@@ -19,11 +19,11 @@ class tournamentController {
   static detailTournament(req, res, next) {
     const { permalink } = req.params;
     Tournament.findOne({ permalink: permalink })
+    .populate("districts")
       .then((tournament) => {
-        res.status(200).json({
-          message: "Berhasil mendapatkan detail tournament",
-          tournament,
-        });
+        res.status(200).json(
+          tournament
+        );
       })
       .catch(next);
   }
