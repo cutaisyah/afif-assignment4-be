@@ -116,7 +116,27 @@ class pesertaController {
     .catch(next);
   }
 
-
+  static getTeamPeserta(req,res,next){
+    // console.log();
+    // const { teamId } = req.params
+    // console.log(teamId)
+    // console.log("teamId",typeof(teamId))
+    // Team.findById(req.userTeam)
+    // .exec((err,team)=>{
+    //   if(err){
+    //     res.status(500).json(err)
+    //   } else if (!team){
+    //     res.status(400).json("Tidak ada team")
+    //   } else {
+        User.find({teams:req.userTeam})
+        // .populate("teams")
+        .then((user)=> {
+          res.status(200).json(user)
+        })
+        .catch(next)
+    //   }
+    // }) 
+  }
 
   // static registerTeam(req, res, next) {
   //   const { teams } = req.body;

@@ -21,4 +21,6 @@ routes.put("/register-tournament/:permalink", pesertaController.pesertaRegisterT
 // routes.post('/team-register-tournament/:teamId', pesertaController.teamRegisterTournament);
 routes.put('/add-member', pesertaController.pesertaRegisterOtherPesertaToTeam);
 
+routes.get("/getTeamPeserta", pesertaController.getTeamPeserta);
+
 module.exports = routes;
