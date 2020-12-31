@@ -10,6 +10,8 @@ const mg = mailgun({
   apiKey: "715cad9ba4a54a9f81b61010ab69dc83-360a0b2c-3f011ff4",
   domain: DOMAIN,
 });
+const {limiterConsecutiveFailsByUsername,maxConsecutiveFailsByUsername} = require('../configs/mongoconn')
+
 // const bruteforce = require ("bruteforce");
 
 class authController {
@@ -87,6 +89,94 @@ class authController {
       return res.json({ message: "Upps maaf sedang ada masalah nih" });
     }
   }
+
+  static async test(req, res,next){
+    async function loginRoute(req, res) {
+      const username = req.body.username;
+      console.log(username);
+      const rlResUsername = await limiterConsecutiveFailsByUsername.get(username);
+      console.log(rlResUsername)
+    
+      if (rlResUsername !== null && rlResUsername.consumedPoints > maxConsecutiveFailsByUsername) {
+      const retrySecs = Math.round(rlResUsername.msBeforeNext / 1000) || 1;
+      res.set('Retry-After', String(retrySecs));
+      res.status(429).send('Too Many Requests');
+      } else {
+        const user = await User.findOne({ username: req.body.username }).populate("districts")
+        if (user === null) {
+          try {
+            await limiterConsecutiveFailsByUsername.consume(username);
+            res.status(400).end('username or password is wrong');
+          } catch (rlRejected) {
+            if (rlRejected instanceof Error) {
+              throw rlRejected;
+            } else {
+              res.set('Retry-After', String(Math.round(rlRejected.msBeforeNext / 1000)) || 1);
+              res.status(429).send('Too Many Requests');
+            }
+          }
+        }
+        var passwordIsValid = bcrypt.compareSync(
+          req.body.password,
+          user.password
+        );
+        if (!passwordIsValid) {
+          try {
+            await limiterConsecutiveFailsByUsername.consume(username);
+            res.status(400).end('username or password is wrong');
+            return
+          } catch (rlRejected) {
+            if (rlRejected instanceof Error) {
+              throw rlRejected;
+            } else {
+              res.set('Retry-After', String(Math.round(rlRejected.msBeforeNext / 1000)) || 1);
+              res.status(429).send('Too Many Requests');
+              return
+            }
+          }
+        }
+        var token = jwt.sign(
+          {
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            teams: user.teams,
+            roles: user.role_name,
+            birthdate: user.birthdate,
+            districts: user.districts
+          },
+          "Assignment4",
+          {
+            expiresIn: 86400,
+          }
+        );
+        // var authorities = [];
+        // console.log(user)
+        var districts = user.districts.district_name;
+        if (rlResUsername !== null && rlResUsername.consumedPoints > 0) {
+          // Reset on successful authorisation
+        await limiterConsecutiveFailsByUsername.delete(username);
+      }
+        res.status(200).json({
+          id: user._id,
+          username: user.username,
+          email: user.email,
+          birthdate: user.birthdate,
+          phone: user.phone,
+          roles: user.role_name,
+          access_token: token,
+          districts: districts,
+        });
+      };
+    }
+    try {
+      await loginRoute(req, res);
+    } catch (err) {
+      console.log(err)
+      res.status(500).end();
+    }
+  }
+  
 
   static signIn(req, res) {
     User.findOne({ username: req.body.username })

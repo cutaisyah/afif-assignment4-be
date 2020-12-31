@@ -14,6 +14,7 @@ routes.use((req,res,next)=>{
 routes.post("/signup", verifySignUp.checkDuplicateUsernameOrEmail, authController.signUpPeserta);
 routes.get("/activate/:token", authController.activatePeserta);
 routes.get("/userid", authJwt.verifyToken, authController.getUserId);
+routes.post("/test", authController.test);
 routes.post("/signin", authController.signIn);
 routes.put("/forgot-password", authController.forgotPassword);
 routes.put("/reset-password/:old_password", authController.resetPassword);
