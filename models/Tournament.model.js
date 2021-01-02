@@ -11,6 +11,7 @@ const tournamentsSchema = new mongoose.Schema({
     description: {type: String, required: true},
     permalink: {type: String, unique:true, required: true },
     is_started: {type: String, enum: ["pending", "ongoing", "completed"], default: "pending"},
+    match_round: {type: Number, default: 1},
     categories: {type: String, enum: ["single elimination", "free for all"], required: true},
     first_prize: {type: String, default:""},
     second_prize: {type: String, default:""},

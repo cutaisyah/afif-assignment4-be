@@ -3,6 +3,7 @@ const panitiaController = require ("../controllers/panitia.controller");
 const authJwt = require ("../middlewares/authJwt");
 const verifyTournament = require("../middlewares/verifyTournament");
 const extractFile = require("../middlewares/file");
+const { route } = require("./tournament.routes");
 
 routes.use((req,res,next)=>{
     res.header(
@@ -25,9 +26,17 @@ routes.put("/edit-tournament/:tournamentId", panitiaController.updateTournament)
 routes.put("/edit-status-tournament-to-ongoing/:tournamentId", panitiaController.changeTournamentStatusOngoing);
 routes.put("/edit-status-tournament-to-completed/:tournamentId", panitiaController.changeTournamentStatusCompleted);
 
+routes.get("/match/:tournamentId", panitiaController.getTheMatch);
+routes.get("/teamMatch/:tournamentId/:matchRound", panitiaController.getTheTeamMatch);
+routes.put("/inputScoreMatch", panitiaController.inputScoreMatch);
+routes.put("/checkEliminate/:tournamentId", panitiaController.checkEliminate);
+routes.put("/thirdwinner/:tournamentId", panitiaController.checkThirdWinnerMatch);
+
+
 routes.get("/get-game", panitiaController.getGameCategory);
 routes.get("/findtournamentbyid/:tournamentId", panitiaController.findTournamentBasedOnId);
 routes.get("/allbaseondistrict", panitiaController.tournamentAllDistrict);
+routes.get("/allbaseondistrictongoing", panitiaController.tournamentAllDistrictOngoing);
 routes.get("/findtournamentgame/:game", panitiaController.findTournamentBasedOnGame);
 
 routes.get("/view-request", panitiaController.viewRequestPeserta);

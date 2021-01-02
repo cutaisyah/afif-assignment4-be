@@ -1,5 +1,6 @@
 const District = require("../models/District.model");
 const Game = require("../models/Game.model");
+const Match = require("../models/Match.model");
 const Tournament = require("../models/Tournament.model");
 
 class tournamentController {
@@ -119,6 +120,22 @@ class tournamentController {
         res.status(200).json(result);
       })
       .catch(next);
+  }
+
+  static getTheMatch(req, res, next){
+    Match.find({tournament: req.params.tournamentId})
+    .populate("tournament")
+    .populate("team")
+    .then(match =>{
+      if(match.length == 0){
+        res.status(400).json({ message: "Nobody registered!" });
+      }else{
+        console.log(match)
+        res.status(200).json({
+          match
+        });
+      }
+    })
   }
 
   //   static async filterTournamentPending(req, res, next) {

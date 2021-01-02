@@ -102,12 +102,7 @@ class pesertaController {
         team.save()
         .then((team) => {
             user.teams = team._id
-            user.save(err=>{
-              if (err.name === 'MongoError' || err.code === 11000) {
-                return res.status(400).send({ succes: false, message: 'User already exist!' });
-              }
-              return res.status(400).send(err);
-            });
+            user.save();
             return res.status(201).json({ message: "Peserta berhasil mendaftarkan team", data: team });
         })
         .catch(next);
@@ -262,10 +257,11 @@ class pesertaController {
       } else{
         User.findById(req.userId)
         .then((leader) => {
-          // console.log("leaderteams",leader.teams)
           if(leader.teams == null){
             res.status(400).json({ message: "Buat Team Terlebih dahulu!" });
-          } else if(leader.tournament_register.toString() !== member.tournament_register.toString()){
+          }else if(leader.tournament_register == null){
+            res.status(400).json({ message: "Pilih Tournament terlebih dahulu!" });
+          }else if(leader.tournament_register.toString() !== member.tournament_register.toString()){
             console.log("Member ini belum terdaftar di tournament yang sama")
             res.status(400).json({ message: "Member ini belum terdaftar di tournament yang sama" });
           } else {
