@@ -21,6 +21,9 @@ class tournamentController {
     const { permalink } = req.params;
     Tournament.findOne({ permalink: permalink })
     .populate("districts")
+    .populate("first_winner")
+    .populate("second_winner")
+    .populate("third_winner")
       .then((tournament) => {
         res.status(200).json(
           tournament
@@ -87,7 +90,7 @@ class tournamentController {
 
   static filterGame(req, res, next) {
     const { gameF } = req.params;
-    console.log("gameF", gameF);
+    // console.log("gameF", gameF);
     Tournament.find({ game: gameF })
     .sort({ tournament_name: 1 })
       .then((result) => {
@@ -128,14 +131,14 @@ class tournamentController {
     .populate("team")
     .then(match =>{
       if(match.length == 0){
-        res.status(400).json({ message: "Nobody registered!" });
+        res.status(200).json({ message: "Nobody registered!" });
       }else{
-        console.log(match)
+        // console.log(match)
         res.status(200).json({
           match
         });
       }
-    })
+    }).catch(next)
   }
 
   //   static async filterTournamentPending(req, res, next) {

@@ -110,11 +110,11 @@ class panitiaController {
   static getGameCategory(req, res, next) {
     let gameCategory;
     Tournament.findOne({ id_user_panitia: req.userId }).then((user) => {
-      console.log(user);
+      // console.log(user);
       gameCategory = user.game;
       Game.findOne({ game_name: gameCategory })
         .then((game) => {
-          console.log(game);
+          // console.log(game);
           res.status(200).json({
             message: "bisa",
           });
@@ -151,7 +151,7 @@ class panitiaController {
 
   static updateTournament(req, res, next) {
     const { tournamentId } = req.params;
-    const { max_total_participant, age_minimum, categories, description, first_prize, second_prize, third_prize } = req.body;
+    const { max_total_participant, age_minimum, categories, description, first_prize, second_prize, third_prize, first_winner, second_winner, third_winner  } = req.body;
     const updatedData = {
       description,
       max_total_participant,
@@ -159,7 +159,10 @@ class panitiaController {
       categories,
       first_prize,
       second_prize,
-      third_prize 
+      third_prize,
+      first_winner,
+      second_winner,
+      third_winner
     };
     for (let key in updatedData) {
       if (!updatedData[key]) {
@@ -199,29 +202,31 @@ class panitiaController {
     User.findById(userId)
     .populate("tournament_approved")
       .then((user) => {
-        if(user.tournament_register == null){
-          res.status(400).json({ message: "user belum teregistrasi!" });
-        }
-        else if(user.teams == null){
+        if(user.teams == null){
           res.status(400).json({ message: "user belum terdapat dalam Team!" });
         }
-        user.tournament_approved = user.tournament_register;
-        user.save();
-        User.find({teams: user.teams})
-        .then(member =>{
-          console.log(member)
-          for (let i = 0; i <= member.length; i++) {
-            member[i].tournament_approved = user.tournament_register;
-            member[i].save();
-          }
-        })
-        .catch(next);
-        const match = new Match({
-          tournament: user.tournament_approved,
-          team: user.teams
-        });
-        match.save();
-        res.status(200).json({ message: "Berhasil mengupdate status menjadi Approved", user });
+        else if(user.tournament_register == null){
+          res.status(400).json({ message: "user belum melakukan registrasi tournament!" });
+        }
+        else{
+          user.tournament_approved = user.tournament_register;
+          user.save();
+          User.find({teams: user.teams})
+          .then(member =>{
+            // console.log(member)
+            for (let i = 0; i <= member.length; i++) {
+              member[i].tournament_approved = user.tournament_register;
+              member[i].save();
+            }
+          })
+          .catch(next);
+          const match = new Match({
+            tournament: user.tournament_approved,
+            team: user.teams
+          });
+          match.save();
+          res.status(200).json({ message: "Berhasil mengupdate status menjadi Approved", user });
+        }
       })
       .catch(next);
   }
@@ -234,7 +239,7 @@ class panitiaController {
       if(match.length == 0){
         res.status(400).json({ message: "Nobody registered!" });
       }else{
-        console.log(match)
+        // console.log(match)
         res.status(200).json({
           match
         });
@@ -275,12 +280,32 @@ class panitiaController {
     .catch(next);
   }
 
+  static changeStatusEliminateTeam(req, res, next){
+    const {team} = req.body
+    Match.findOne({team: team})
+    .populate("tournament")
+    .populate("team")
+    .then(user => {
+      // console.log(typeof user.isEliminate);
+      if(user.isEliminate == 0){
+        user.isEliminate = 1;
+        user.save();
+        res.status(200).json({ message: "status eliminated True!" });
+      }else{
+        user.isEliminate = 0;
+        user.save();
+        res.status(200).json({message: "status eliminated False!"});
+      }
+    })
+    .catch(next);
+  }
+
   static checkThirdWinnerMatch(req, res, next){
     const {tournamentId} = req.params;
     const {match_round} = req.body
     Match.find({tournament: tournamentId, match_round: match_round-1, isEliminate: true})
     .then(match =>{
-      console.log(match);
+      // console.log(match);
       for (let i = 0; i < match.length; i++) {
         Match.create({tournament: tournamentId, team: match[i].team, match_round: match[i].match_round+=1, isEliminate: true})
       }
@@ -300,7 +325,7 @@ class panitiaController {
         return;
       }else{
         for (let i = 0; i <= match.length; i+=2) {
-          console.log(i)
+          // console.log(i)
             if(match[i] == match[match.length]){
               Tournament.findById(tournamentId)
               .then(tournament =>{

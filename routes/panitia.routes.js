@@ -29,6 +29,7 @@ routes.put("/edit-status-tournament-to-completed/:tournamentId", panitiaControll
 routes.get("/match/:tournamentId", panitiaController.getTheMatch);
 routes.get("/teamMatch/:tournamentId/:matchRound", panitiaController.getTheTeamMatch);
 routes.put("/inputScoreMatch", panitiaController.inputScoreMatch);
+routes.put("/changeStatusEliminateTeam", panitiaController.changeStatusEliminateTeam);
 routes.put("/checkEliminate/:tournamentId", panitiaController.checkEliminate);
 routes.put("/thirdwinner/:tournamentId", panitiaController.checkThirdWinnerMatch);
 
