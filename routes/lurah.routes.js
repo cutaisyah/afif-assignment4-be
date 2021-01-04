@@ -17,5 +17,7 @@ routes.get("/get/:userId", lurahController.getLurahId);
 routes.post("/create-panitia", verifyToken.checkDuplicateUsernameOrEmail, lurahController.createPanitia);
 routes.get("/data-panitia", lurahController.dataPanitia);
 
+routes.get("/allbaseondistrict", lurahController.dataTournamentByDistrict);
+
 
 module.exports = routes;
