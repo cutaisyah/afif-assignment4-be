@@ -17,6 +17,7 @@ class authJwt {
           req.userRole = decoded.roles;
           req.userAge = decoded.birthdate;
           req.userTeam = decoded.teams;
+          req.userPassword = decoded.password;
           next();
         });
     };

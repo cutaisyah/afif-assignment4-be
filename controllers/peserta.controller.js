@@ -9,7 +9,8 @@ const bcrypt = require("bcrypt");
 class pesertaController {
   static updatePeserta(req, res, next) {
     const userId = req.userId;
-    const { username, email, password, birthdate, phone } = req.body;
+    const password = bcrypt.hashSync(req.body.password, 8);
+    const { username, email, birthdate, phone } = req.body;
     const updatedData = { username, email, password, birthdate, phone };
     for (let key in updatedData) {
       if (!updatedData[key]) {
@@ -18,10 +19,9 @@ class pesertaController {
     }
     User.findByIdAndUpdate(userId, updatedData, { new: true })
       .then((peserta) => {
-        res.status(200).json({
-          message: "Berhasil mengupdate data peserta",
-          updated: peserta,
-        });
+        peserta.old_password = req.userPassword;
+        peserta.save();
+        res.status(200).json({message: "Berhasil mengupdate data peserta", updated: peserta});
       })
       .catch(next);
   }

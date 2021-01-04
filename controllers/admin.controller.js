@@ -47,7 +47,8 @@ class adminController {
 
   static updateAdmin(req, res, next) {
     const { userId } = req.params;
-    const { username, email, password, birthdate, phone } = req.body;
+    const password = bcrypt.hashSync(req.body.password, 8)
+    const { username, email, birthdate, phone } = req.body;
     const updatedData = { username, email, password, birthdate, phone };
     for (let key in updatedData) {
       if (!updatedData[key]) {
@@ -56,6 +57,8 @@ class adminController {
     }
     User.findByIdAndUpdate(userId, updatedData, { new: true })
       .then((user) => {
+        user.old_password = req.userPassword;
+        user.save();
         res
           .status(200)
           .json({ message: "Berhasil mengupdate data admin", updated: user });
@@ -138,7 +141,7 @@ class adminController {
   }
 
   static dataLurah(req, res, next) {
-    User.find({ roles: "5fcb009dbb23a6115cc6b3f9" })
+    User.find({ role_name: "lurah" })
       .populate("roles")
       .sort({ username: 1 }) // ASC : 1 -- DES:-1
       .then((result) => {
