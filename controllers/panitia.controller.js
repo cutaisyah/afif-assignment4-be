@@ -258,7 +258,7 @@ class panitiaController {
           .then(member =>{
             // console.log(member)
             //if lagi
-            for (let i = 0; i <= member.length; i++) {
+            for (let i = 0; i < member.length; i++) {
               member[i].tournament_approved = user.tournament_register;
               member[i].save();
             }
