@@ -12,7 +12,7 @@ routes.use((req,res,next)=>{
 });
 
 routes.use(authJwt.verifyToken, authJwt.isLurah);
-routes.put("/update/:userId", lurahController.updateLurah);
+routes.put("/update", lurahController.updateLurah);
 routes.get("/get/:userId", lurahController.getLurahId);
 routes.post("/create-panitia", verifyToken.checkDuplicateUsernameOrEmail, lurahController.createPanitia);
 routes.get("/data-panitia", lurahController.dataPanitia);

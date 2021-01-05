@@ -12,13 +12,13 @@ const { result } = require("lodash");
 const Game = require("../models/Game.model");
 const Match = require("../models/Match.model");
 const { update } = require("../models/User.model");
+const bcrypt = require("bcrypt");
 
 class panitiaController {
   static updatePanitia(req, res, next) {
-    const { userId } = req.params;
-    const password = bcrypt.hashSync(req.body.password, 8)
+    const userId = req.userId;
     const { username, email, birthdate, phone } = req.body;
-    const updatedData = { username, email, password, birthdate, phone };
+    const updatedData = { username, email, birthdate, phone };
     for (let key in updatedData) {
       if (!updatedData[key]) {
         delete updatedData[key];
@@ -26,12 +26,52 @@ class panitiaController {
     }
     User.findByIdAndUpdate(userId, updatedData, { new: true })
       .then((panitia) => {
-        panitia.old_password = req.userPassword;
-        panitia.save();
-        res.status(200).json({
-          message: "Berhasil mengupdate data panitia",
-          updated: panitia,
-        });
+        res.status(200).json({message: "Berhasil mengupdate data panitia", updated: panitia});
+      })
+      .catch(next);
+  }
+
+  static changePassword(req, res, next) {
+    const userId = req.userId;
+    let password = bcrypt.hashSync(req.body.password,8);
+    let old_password = bcrypt.hashSync(req.body.old_password,8);
+    const updatedData = { password, old_password };
+    console.log(updatedData);
+    // for (let key in updatedData){
+    //     if(!updatedData[key]){
+    //       delete updatedData[key]
+    //     }
+    // }
+    //verifakisi
+    User.findById(userId)
+      .then((result) => {
+        //   console.log(result);
+        var passwordIsValid = bcrypt.compareSync(
+          req.body.old_password,
+          result.password
+        );
+        if (!passwordIsValid) {
+          res.status(400).json({
+            message: "Verifikasi Password tidak sesuai",
+            updated: result,
+          });
+        } else {
+          User.findByIdAndUpdate(userId, updatedData, { new: true })
+            .then((result) => {
+            //   console.log(result);
+            //   const a = bcrypt.hashSync(result.password, 8);
+            //   console.log(a);
+            //   result.old_password == a;
+              result.old_password == result.password;
+              result.password == req.body.password;
+            //   console.log(result);
+              res.status(200).json({
+                message: "Berhasil mengupdate data password",
+                updated: result,
+              });
+            })
+            .catch(next);
+        }
       })
       .catch(next);
   }
@@ -217,6 +257,7 @@ class panitiaController {
           User.find({teams: user.teams})
           .then(member =>{
             // console.log(member)
+            //if lagi
             for (let i = 0; i <= member.length; i++) {
               member[i].tournament_approved = user.tournament_register;
               member[i].save();

@@ -9,9 +9,9 @@ const bcrypt = require("bcrypt");
 class pesertaController {
   static updatePeserta(req, res, next) {
     const userId = req.userId;
-    const password = bcrypt.hashSync(req.body.password, 8);
     const { username, email, birthdate, phone } = req.body;
-    const updatedData = { username, email, password, birthdate, phone };
+    const updatedData = { username, email, birthdate, phone };
+    console.log(updatedData)
     for (let key in updatedData) {
       if (!updatedData[key]) {
         delete updatedData[key];
@@ -19,17 +19,10 @@ class pesertaController {
     }
     User.findByIdAndUpdate(userId, updatedData, { new: true })
       .then((peserta) => {
-        peserta.old_password = req.userPassword;
-        peserta.save();
         res.status(200).json({message: "Berhasil mengupdate data peserta", updated: peserta});
       })
       .catch(next);
   }
-
-  //oldpassword
-
-  //old_password = password yang sekarang
-  //password = new password
 
   static changePassword(req, res, next) {
     const userId = req.userId;
@@ -51,7 +44,7 @@ class pesertaController {
           result.password
         );
         if (!passwordIsValid) {
-          res.status(200).json({
+          res.status(400).json({
             message: "Verifikasi Password tidak sesuai",
             updated: result,
           });

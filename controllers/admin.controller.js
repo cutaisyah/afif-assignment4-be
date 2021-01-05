@@ -46,10 +46,9 @@ class adminController {
   }
 
   static updateAdmin(req, res, next) {
-    const { userId } = req.params;
-    const password = bcrypt.hashSync(req.body.password, 8)
+    const { userId } = req.userId;
     const { username, email, birthdate, phone } = req.body;
-    const updatedData = { username, email, password, birthdate, phone };
+    const updatedData = { username, email, birthdate, phone };
     for (let key in updatedData) {
       if (!updatedData[key]) {
         delete updatedData[key];
@@ -57,11 +56,42 @@ class adminController {
     }
     User.findByIdAndUpdate(userId, updatedData, { new: true })
       .then((user) => {
-        user.old_password = req.userPassword;
-        user.save();
         res
           .status(200)
           .json({ message: "Berhasil mengupdate data admin", updated: user });
+      })
+      .catch(next);
+  }
+
+  static changePassword(req, res, next) {
+    const userId = req.userId;
+    let password = bcrypt.hashSync(req.body.password,8);
+    let old_password = bcrypt.hashSync(req.body.old_password,8);
+    const updatedData = { password, old_password };
+    User.findById(userId)
+      .then((result) => {
+        //   console.log(result);
+        var passwordIsValid = bcrypt.compareSync(
+          req.body.old_password,
+          result.password
+        );
+        if (!passwordIsValid) {
+          res.status(400).json({
+            message: "Verifikasi Password tidak sesuai",
+            updated: result,
+          });
+        } else {
+          User.findByIdAndUpdate(userId, updatedData, { new: true })
+            .then((result) => {
+              result.old_password == result.password;
+              result.password == req.body.password;
+              res.status(200).json({
+                message: "Berhasil mengupdate data password",
+                updated: result,
+              });
+            })
+            .catch(next);
+        }
       })
       .catch(next);
   }
@@ -94,29 +124,18 @@ class adminController {
         res.status(500).send({ message: err });
         return;
       }
-      // if(req.body.roles && req.body.districts){
-      // Role.findOne({role_name: "lurah"})
-      // .then(role=>{
-      //     user.roles = [role._id];
-      //     roless = role.role_name;
-      //     console.log(role);
-
-      // });
       District.findOne({ district_name: req.body.districts })
         .then((district) => {
           user.districts = district._id;
           districtss = district.district_name;
           user.save().then((userss) => {
             userss.districts = districtss;
-            // userss.roles[0] = roless;
-            // console.log(userss.roles);
             res
               .status(201)
               .json({ message: "Anda telah berhasil menjadi lurah", userss });
           });
         })
         .catch(next);
-      // }
     });
   }
 

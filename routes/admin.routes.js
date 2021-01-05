@@ -12,7 +12,8 @@ routes.use((req,res,next)=>{
 });
 routes.post("/signup", verifySignUp.checkDuplicateUsernameOrEmail, adminController.signUpAdmin);
 routes.use(authJwt.verifyToken, authJwt.isAdmin);
-routes.put("/update/:userId", adminController.updateAdmin);
+routes.put("/update", adminController.updateAdmin);
+routes.put("/update-password", adminController.changePassword);
 routes.get("/get/:userId", adminController.getAdminId);
 routes.post("/create-lurah", verifySignUp.checkDuplicateUsernameOrEmail, adminController.createLurah);
 routes.post("/create-role", adminController.createRole);

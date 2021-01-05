@@ -14,7 +14,8 @@ routes.use((req,res,next)=>{
 });
 
 routes.use(authJwt.verifyToken, authJwt.isPanitia);
-routes.put("/update/:userId", panitiaController.updatePanitia);
+routes.put("/update", panitiaController.updatePanitia);
+routes.put("/update-password", panitiaController.changePassword);
 routes.get("/get/:userId", panitiaController.getPanitiaId);
 routes.get("/data-peserta", panitiaController.getDataPesertaRegistered);
 routes.put("/edit-status-to-approved/:userId", panitiaController.changeToApproved);

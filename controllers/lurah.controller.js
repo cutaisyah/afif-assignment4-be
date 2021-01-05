@@ -6,7 +6,7 @@ const Tournament = require("../models/Tournament.model");
 
 class lurahController {
   static updateLurah(req, res, next) {
-    const { userId } = req.params;
+    const { userId } = req.userId;
     const password = bcrypt.hashSync(req.body.password, 8);
     const { username, email, birthdate, phone } = req.body;
     const updatedData = { username, email, password, birthdate, phone };
