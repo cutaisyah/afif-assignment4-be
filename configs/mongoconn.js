@@ -7,6 +7,7 @@ const redisClient = redis.createClient({
 const maxConsecutiveFailsByUsername = 5;
 const limiterConsecutiveFailsByUsername = new RateLimiterRedis({
   redis: redisClient,
+  storeClient: redisClient,
   keyPrefix: 'login_fail_consecutive_username',
   points: maxConsecutiveFailsByUsername,
   duration: 60 * 60 * 3, // Store number for three hours since first fail

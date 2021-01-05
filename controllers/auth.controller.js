@@ -5,9 +5,9 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const mailgun = require("mailgun-js");
 const lodash = require("lodash");
-const DOMAIN = "sandbox0a102922ac694ab3a230ca1f5f3c09cd.mailgun.org";
+const DOMAIN = "sandbox4b311a423c60460db656e818309644a4.mailgun.org";
 const mg = mailgun({
-  apiKey: "715cad9ba4a54a9f81b61010ab69dc83-360a0b2c-3f011ff4",
+  apiKey: "6e5f151e1b0e935bbe01488e79f9e7ec-3d0809fb-d5412262",
   domain: DOMAIN,
 });
 const {limiterConsecutiveFailsByUsername,maxConsecutiveFailsByUsername} = require('../configs/mongoconn')
@@ -270,7 +270,7 @@ class authController {
         subject: "Password Reset",
         html: `
                     <h2>Silahkan klik link berikut ini untuk mereset password anda</h2>
-                    <p>http://localhost:8080/auth/resetpassword/${token}</p>
+                    <p>http://localhost:4200/forgot/resetPass/${token}</p>
                 `,
       };
 
@@ -297,7 +297,7 @@ class authController {
 
   static resetPassword(req, res) {
     const { old_password } = req.params;
-    const { newPassword } = req.body;
+    const { password } = req.body;
     if (old_password) {
       jwt.verify(old_password, "Assignment4", function (error, decodedData) {
         if (error) {
@@ -312,9 +312,10 @@ class authController {
               .json({ message: "Pengguna dengan token ini tidak ditemukan" });
           }
           const obj = {
-            password: newPassword,
+            password: bcrypt.hashSync(password,8),
             old_password: "",
           };
+
           user = lodash.extend(user, obj);
           user.save((err, user) => {
             if (err) {
