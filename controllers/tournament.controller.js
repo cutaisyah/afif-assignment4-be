@@ -116,7 +116,6 @@ class tournamentController {
   static filterTournamentPending(req, res, next) {
     Tournament.find({ is_started: "pending" })
     .sort({ tournament_name: 1 })
-      .$where("this.register_total_participant < this.max_total_participant")
       .populate("districts")
       .then((result) => {
         // console.log(result);

@@ -91,7 +91,6 @@ class panitiaController {
 
   static getDataPesertaRegistered(req, res, next) {
     User.find({ role_name: "peserta", districts: req.userDistrict })
-      .$where('this.tournament_register !== null')
       .populate("roles").populate("districts").populate("tournament_approved").populate("teams").populate("tournament_register")
       .then((result) => {
         res.status(200).json({
