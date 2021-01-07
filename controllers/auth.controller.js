@@ -24,54 +24,19 @@ class authController {
       phone: req.body.phone,
       role_name: "peserta",
       old_password: "",
+      districts: req.body.districts,
     });
-    // const token = jwt.sign({username: req.body.username,  email: req.body.email, password: bcrypt.hashSync(req.body.password, 8)}, "Assignment4", {expiresIn:"20m"});
-    // const data = {
-    //     from: 'noreply@tournament.com',
-    //     to: req.body.email,
-    //     subject: 'Email Authenthication',
-    //     html: `
-    //         <h2>Silahkan klik link berikut ini untuk mengaktifkan akun anda</h2>
-    //         <p>http://localhost:8080/auth/activate/${token}</p>
-    //     `
-    // };
-    // mg.messages().send(data, function (error, body) {
-    //     if(error){
-    //         return res.json({message:error})
-    //     }
-    // });
-    // var districtss,roless
-    var districtss;
-    user.save((err, user) => {
-      if (err) {
-        res.status(500).send({ message: err });
-        return;
-      }
-      // if(req.body.role_name && req.body.districts){
-      // User.findOne({role_name: "peserta"})
-      // .then(user=>{
-      //     user.role_name = "peserta";
-      //     // roless = role.role_name;
-      // });
-      District.findOne({ district_name: req.body.districts })
-        .then((district) => {
-          if(district.district_name == null){
-            res.status(400).json({message: "Distrik tidak ada"});
-          }else{
-            // console.log(district);
-            user.districts = district._id;
-            districtss = district.district_name;
-            user.save().then((userss) => {
-              userss.districts = districtss;
-              res
-                .status(201)
-                .json({ message: "Peserta Berhasil mendaftar", userss });
-            });
-          }
-        })
-        .catch(next);
-      // }
-    });
+    user.save()
+      .then((result) => {
+        res.status(201).json({
+          message: "Berhasil Mendaftar!"
+        });
+      })
+      .catch((err) => {
+        res.status(500).json({
+          message: "Data Sudah Pernah Terbuat!",
+        });
+      });
   }
 
   static activatePeserta(req, res) {
