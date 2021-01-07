@@ -1,18 +1,20 @@
 const User = require("../models/User.model");
-const Role = require("../models/Role.model");
-const District = require("../models/District.model");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const mailgun = require("mailgun-js");
 const lodash = require("lodash");
-const DOMAIN = "sandbox30ff1231bb0248ac99c6d3feaf83fada.mailgun.org";
+const DOMAIN = "sandbox1221511010a04e7aa8eeddf81e8c8006.mailgun.org";
+require('dotenv').config();
 const mg = mailgun({
-  apiKey: "d88777eb6d99390072c1be7c1368784d-3d0809fb-c2ae8f0f",
+  // apiKey: "b1230b9d1b8c3c69a2e09a72f288933b-3d0809fb-441e846b",
+  apiKey: process.env.API_KEY,
+  publicApiKey: "pubkey-4231788d1468b87ae2b1fce7a39e7b9e",
   domain: DOMAIN,
 });
-const {limiterConsecutiveFailsByUsername,maxConsecutiveFailsByUsername} = require('../configs/mongoconn')
-
-// const bruteforce = require ("bruteforce");
+const {
+  limiterConsecutiveFailsByUsername,
+  maxConsecutiveFailsByUsername,
+} = require("../configs/mongoconn");
 
 class authController {
   static signUpPeserta(req, res, next) {
@@ -26,10 +28,11 @@ class authController {
       old_password: "",
       districts: req.body.districts,
     });
-    user.save()
+    user
+      .save()
       .then((result) => {
         res.status(201).json({
-          message: "Berhasil Mendaftar!"
+          message: "Berhasil Mendaftar!",
         });
       })
       .catch((err) => {
@@ -39,49 +42,59 @@ class authController {
       });
   }
 
-  static activatePeserta(req, res) {
-    const { token } = req.params;
-    if (token) {
-      jwt.verify(token, "Assignment4", function (err, decodedToken) {
-        if (err) {
-          return res
-            .status(400)
-            .json({ message: "Link salah atau sudah kadaluarsa" });
-        }
-        res
-          .status(200)
-          .json({ message: "Akun berhasil diaktivasi", decodedToken });
-      });
-    } else {
-      return res.json({ message: "Upps maaf sedang ada masalah nih" });
-    }
-  }
+  // static activatePeserta(req, res) {
+  //   const { token } = req.params;
+  //   if (token) {
+  //     jwt.verify(token, "Assignment4", function (err, decodedToken) {
+  //       if (err) {
+  //         return res
+  //           .status(400)
+  //           .json({ message: "Link salah atau sudah kadaluarsa" });
+  //       }
+  //       res
+  //         .status(200)
+  //         .json({ message: "Akun berhasil diaktivasi", decodedToken });
+  //     });
+  //   } else {
+  //     return res.json({ message: "Upps maaf sedang ada masalah nih" });
+  //   }
+  // }
 
-  static async test(req, res,next){
+  static async test(req, res, next) {
     async function loginRoute(req, res) {
       const username = req.body.username;
       console.log(username);
-      const rlResUsername = await limiterConsecutiveFailsByUsername.get(username);
-      console.log(rlResUsername)
-    
-      if (rlResUsername !== null && rlResUsername.consumedPoints > maxConsecutiveFailsByUsername) {
-      const retrySecs = Math.round(rlResUsername.msBeforeNext / 1000) || 1;
-      res.set('Retry-After', String(retrySecs));
-      res.status(429).send('Too Many Requests');
+      const rlResUsername = await limiterConsecutiveFailsByUsername.get(
+        username
+      );
+      console.log(rlResUsername);
+
+      if (
+        rlResUsername !== null &&
+        rlResUsername.consumedPoints > maxConsecutiveFailsByUsername
+      ) {
+        const retrySecs = Math.round(rlResUsername.msBeforeNext / 1000) || 1;
+        res.set("Retry-After", String(retrySecs));
+        res.status(429).send("Too Many Requests");
       } else {
-        const user = await User.findOne({ username: req.body.username }).populate("districts")
+        const user = await User.findOne({
+          username: req.body.username,
+        }).populate("districts");
         if (user === null) {
           try {
             await limiterConsecutiveFailsByUsername.consume(username);
-            res.status(400).end('username or password is wrong');
-            return
+            res.status(400).end("username or password is wrong");
+            return;
           } catch (rlRejected) {
             if (rlRejected instanceof Error) {
               throw rlRejected;
             } else {
-              res.set('Retry-After', String(Math.round(rlRejected.msBeforeNext / 1000)) || 1);
-              res.status(429).send('Too Many Requests');
-              return
+              res.set(
+                "Retry-After",
+                String(Math.round(rlRejected.msBeforeNext / 1000)) || 1
+              );
+              res.status(429).send("Too Many Requests");
+              return;
             }
           }
         }
@@ -92,15 +105,18 @@ class authController {
         if (!passwordIsValid) {
           try {
             await limiterConsecutiveFailsByUsername.consume(username);
-            res.status(400).end('username or password is wrong');
-            return
+            res.status(400).end("username or password is wrong");
+            return;
           } catch (rlRejected) {
             if (rlRejected instanceof Error) {
               throw rlRejected;
             } else {
-              res.set('Retry-After', String(Math.round(rlRejected.msBeforeNext / 1000)) || 1);
-              res.status(429).send('Too Many Requests');
-              return
+              res.set(
+                "Retry-After",
+                String(Math.round(rlRejected.msBeforeNext / 1000)) || 1
+              );
+              res.status(429).send("Too Many Requests");
+              return;
             }
           }
         }
@@ -125,8 +141,8 @@ class authController {
         var districts = user.districts.district_name;
         if (rlResUsername !== null && rlResUsername.consumedPoints > 0) {
           // Reset on successful authorisation
-        await limiterConsecutiveFailsByUsername.delete(username);
-      }
+          await limiterConsecutiveFailsByUsername.delete(username);
+        }
         res.status(200).json({
           id: user._id,
           username: user.username,
@@ -137,16 +153,15 @@ class authController {
           access_token: token,
           districts: districts,
         });
-      };
+      }
     }
     try {
       await loginRoute(req, res);
     } catch (err) {
-      console.log(err)
+      console.log(err);
       res.status(500).end();
     }
   }
-  
 
   static signIn(req, res) {
     User.findOne({ username: req.body.username })
@@ -180,7 +195,7 @@ class authController {
             teams: user.teams,
             roles: user.role_name,
             birthdate: user.birthdate,
-            districts: user.districts
+            districts: user.districts,
           },
           "Assignment4",
           {
@@ -227,12 +242,11 @@ class authController {
   static forgotPassword(req, res) {
     const { email } = req.body;
     User.findOne({ email }, (err, user) => {
+      console.log(user);
       if (!user) {
         return res.status(400).json({ message: "Pengguna tidak ditemukan" });
       }
-      const token = jwt.sign({ _id: user._id }, "Assignment4", {
-        expiresIn: "20m",
-      });
+      const token = jwt.sign({ _id: user._id }, "Assignment4", { expiresIn: "24h" });
       const data = {
         from: "noreply@tournament.com",
         to: req.body.email,
@@ -242,8 +256,8 @@ class authController {
                     <p>http://localhost:4200/forgot/resetPass/${token}</p>
                 `,
       };
-
-      return user.updateOne({ old_password: token }, function (err, success) {
+      // console.log(data);
+      return user.updateOne({ resetLink: token }, function (err, success) {
         if (err) {
           return res
             .status(400)
@@ -265,38 +279,24 @@ class authController {
   }
 
   static resetPassword(req, res) {
-    const { old_password } = req.params;
+    const { reset_link } = req.params;
     const { password } = req.body;
-    if (old_password) {
-      jwt.verify(old_password, "Assignment4", function (error, decodedData) {
+    if (reset_link) {
+      jwt.verify(reset_link, "Assignment4", function (error, decodedData) {
         if (error) {
-          return res
-            .status(401)
-            .json({ message: "Token salah atau telah kadaluarsa" });
+          return res.status(401).json({ message: "Token salah atau telah kadaluarsa" });
         }
-        User.findOne({ old_password }, (err, user) => {
+        User.findOne({ reset_link }, (err, user) => {
           if (!user) {
-            return res
-              .status(400)
-              .json({ message: "Pengguna dengan token ini tidak ditemukan" });
+            return res.status(400).json({ message: "Pengguna dengan token ini tidak ditemukan" });
           }
-          const obj = {
-            password: bcrypt.hashSync(password,8),
-            old_password: "",
-          };
-
-          user = lodash.extend(user, obj);
+          user.password = bcrypt.hashSync(password, 8);
+          user.reset_link = "";
           user.save((err, user) => {
             if (err) {
               return res.status(400).json({ message: "reset password error" });
             } else {
-              return res.status(200).json({
-                message: "password berhasil diganti",
-                id: user._id,
-                username: user.username,
-                email: user.email,
-                password: bcrypt.hashSync(user.password, 8),
-              });
+              return res.status(200).json({ message: "password berhasil diganti" });
             }
           });
         });
