@@ -150,13 +150,17 @@ class adminController {
 
   static createDistrict(req, res, next) {
     const { district_name } = req.body;
-    District.create({ district_name })
+    if(district_name == null){
+      res.status(400).json({ message: "isi nama district terlebih dahulu"});
+    }else{
+      District.create({ district_name })
       .then((district) => {
         res
           .status(201)
           .json({ message: "District berhasil ditambahkan", district });
       })
       .catch(next);
+    }
   }
 
   static dataLurah(req, res, next) {
