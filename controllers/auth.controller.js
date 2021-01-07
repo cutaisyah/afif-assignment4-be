@@ -5,9 +5,9 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const mailgun = require("mailgun-js");
 const lodash = require("lodash");
-const DOMAIN = "sandbox4b311a423c60460db656e818309644a4.mailgun.org";
+const DOMAIN = "sandbox30ff1231bb0248ac99c6d3feaf83fada.mailgun.org";
 const mg = mailgun({
-  apiKey: "6e5f151e1b0e935bbe01488e79f9e7ec-3d0809fb-d5412262",
+  apiKey: "d88777eb6d99390072c1be7c1368784d-3d0809fb-c2ae8f0f",
   domain: DOMAIN,
 });
 const {limiterConsecutiveFailsByUsername,maxConsecutiveFailsByUsername} = require('../configs/mongoconn')
@@ -109,12 +109,14 @@ class authController {
           try {
             await limiterConsecutiveFailsByUsername.consume(username);
             res.status(400).end('username or password is wrong');
+            return
           } catch (rlRejected) {
             if (rlRejected instanceof Error) {
               throw rlRejected;
             } else {
               res.set('Retry-After', String(Math.round(rlRejected.msBeforeNext / 1000)) || 1);
               res.status(429).send('Too Many Requests');
+              return
             }
           }
         }
