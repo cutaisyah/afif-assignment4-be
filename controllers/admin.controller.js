@@ -155,9 +155,7 @@ class adminController {
     }else{
       District.create({ district_name })
       .then((district) => {
-        res
-          .status(201)
-          .json({ message: "District berhasil ditambahkan", district });
+        res.status(201).json({ message: "District berhasil ditambahkan", district });
       })
       .catch(next);
     }

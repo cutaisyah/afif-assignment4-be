@@ -55,17 +55,19 @@ class authController {
       // });
       District.findOne({ district_name: req.body.districts })
         .then((district) => {
-          console.log(district);
-          user.districts = district._id;
-          districtss = district.district_name;
-          user.save().then((userss) => {
-            userss.districts = districtss;
-            // userss.roles[0] = roless
-            // console.log(userss.roles);
-            res
-              .status(201)
-              .json({ message: "Peserta Berhasil mendaftar", userss });
-          });
+          if(district.district_name == null){
+            res.status(400).json({message: "Distrik tidak ada"});
+          }else{
+            // console.log(district);
+            user.districts = district._id;
+            districtss = district.district_name;
+            user.save().then((userss) => {
+              userss.districts = districtss;
+              res
+                .status(201)
+                .json({ message: "Peserta Berhasil mendaftar", userss });
+            });
+          }
         })
         .catch(next);
       // }
