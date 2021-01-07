@@ -1,17 +1,10 @@
 const User = require("../models/User.model");
-// const formidable = require("formidable");
-// const fs = require("fs");
 const Tournament = require("../models/Tournament.model");
-const Role = require("../models/Role.model");
-const District = require("../models/District.model");
-const TournamentCategory = require("../models/TournamentCategory.model");
 const TournamentApproved = require("../models/TournamentApproved.model");
 const TournamentPrize = require("../models/TournamentPrize.model");
 const Team = require("../models/Team.model");
-const { result } = require("lodash");
 const Game = require("../models/Game.model");
 const Match = require("../models/Match.model");
-const { update } = require("../models/User.model");
 const bcrypt = require("bcrypt");
 
 class panitiaController {
@@ -26,26 +19,24 @@ class panitiaController {
     }
     User.findByIdAndUpdate(userId, updatedData, { new: true })
       .then((panitia) => {
-        res.status(200).json({message: "Berhasil mengupdate data panitia", updated: panitia});
+        res
+          .status(200)
+          .json({
+            message: "Berhasil mengupdate data panitia",
+            updated: panitia,
+          });
       })
       .catch(next);
   }
 
   static changePassword(req, res, next) {
     const userId = req.userId;
-    let password = bcrypt.hashSync(req.body.password,8);
-    let old_password = bcrypt.hashSync(req.body.old_password,8);
+    let password = bcrypt.hashSync(req.body.password, 8);
+    let old_password = bcrypt.hashSync(req.body.old_password, 8);
     const updatedData = { password, old_password };
     console.log(updatedData);
-    // for (let key in updatedData){
-    //     if(!updatedData[key]){
-    //       delete updatedData[key]
-    //     }
-    // }
-    //verifakisi
     User.findById(userId)
       .then((result) => {
-        //   console.log(result);
         var passwordIsValid = bcrypt.compareSync(
           req.body.old_password,
           result.password
@@ -58,13 +49,8 @@ class panitiaController {
         } else {
           User.findByIdAndUpdate(userId, updatedData, { new: true })
             .then((result) => {
-            //   console.log(result);
-            //   const a = bcrypt.hashSync(result.password, 8);
-            //   console.log(a);
-            //   result.old_password == a;
               result.old_password == result.password;
               result.password == req.body.password;
-            //   console.log(result);
               res.status(200).json({
                 message: "Berhasil mengupdate data password",
                 updated: result,
@@ -91,7 +77,11 @@ class panitiaController {
 
   static getDataPesertaRegistered(req, res, next) {
     User.find({ role_name: "peserta", districts: req.userDistrict })
-      .populate("roles").populate("districts").populate("tournament_approved").populate("teams").populate("tournament_register")
+      .populate("roles")
+      .populate("districts")
+      .populate("tournament_approved")
+      .populate("teams")
+      .populate("tournament_register")
       .then((result) => {
         res.status(200).json({
           message: "Berhasil mendapatkan list semua peserta",
@@ -122,7 +112,7 @@ class panitiaController {
         tournament_name: req.body.tournament_name,
         permalink: req.body.permalink,
         categories: req.body.categories,
-        game: result, //renang
+        game: result,
         total_participant: req.body.total_participant,
         age_minimum: req.body.age_minimum,
         description: req.body.description,
@@ -152,11 +142,9 @@ class panitiaController {
   static getGameCategory(req, res, next) {
     let gameCategory;
     Tournament.findOne({ id_user_panitia: req.userId }).then((user) => {
-      // console.log(user);
       gameCategory = user.game;
       Game.findOne({ game_name: gameCategory })
         .then((game) => {
-          // console.log(game);
           res.status(200).json({
             message: "bisa",
           });
@@ -169,7 +157,7 @@ class panitiaController {
     const { game } = req.params;
     Tournament.find({ game })
       .then((game) => {
-        if(game.length == 0){
+        if (game.length == 0) {
           res.status(400).json({ message: "Game not Found!" });
         } else {
           res.status(200).json({ message: "Game Found!", game: game });
@@ -180,12 +168,14 @@ class panitiaController {
 
   static findTournamentBasedOnId(req, res, next) {
     const { tournamentId } = req.params;
-    Tournament.findById( tournamentId )
+    Tournament.findById(tournamentId)
       .then((tournament) => {
-        if(tournament.length == 0){
+        if (tournament.length == 0) {
           res.status(400).json({ message: "Game not Found!" });
         } else {
-          res.status(200).json({ message: "Game Found!", tournament: tournament });
+          res
+            .status(200)
+            .json({ message: "Game Found!", tournament: tournament });
         }
       })
       .catch(next);
@@ -193,7 +183,18 @@ class panitiaController {
 
   static updateTournament(req, res, next) {
     const { tournamentId } = req.params;
-    const { max_total_participant, age_minimum, categories, description, first_prize, second_prize, third_prize, first_winner, second_winner, third_winner  } = req.body;
+    const {
+      max_total_participant,
+      age_minimum,
+      categories,
+      description,
+      first_prize,
+      second_prize,
+      third_prize,
+      first_winner,
+      second_winner,
+      third_winner,
+    } = req.body;
     const updatedData = {
       description,
       max_total_participant,
@@ -204,7 +205,7 @@ class panitiaController {
       third_prize,
       first_winner,
       second_winner,
-      third_winner
+      third_winner,
     };
     for (let key in updatedData) {
       if (!updatedData[key]) {
@@ -223,18 +224,30 @@ class panitiaController {
 
   static changeTournamentStatusOngoing(req, res, next) {
     const { tournamentId } = req.params;
-    Tournament.findByIdAndUpdate(tournamentId, {is_started: "ongoing"}, { new: true })
+    Tournament.findByIdAndUpdate(
+      tournamentId,
+      { is_started: "ongoing" },
+      { new: true }
+    )
       .then((tournament) => {
-        res.status(200).json({ message: "Berhasil mengupdate status turnamen", tournament });
+        res
+          .status(200)
+          .json({ message: "Berhasil mengupdate status turnamen", tournament });
       })
       .catch(next);
   }
 
   static changeTournamentStatusCompleted(req, res, next) {
     const { tournamentId } = req.params;
-    Tournament.findByIdAndUpdate(tournamentId, {is_started: "completed"}, { new: true })
+    Tournament.findByIdAndUpdate(
+      tournamentId,
+      { is_started: "completed" },
+      { new: true }
+    )
       .then((tournament) => {
-        res.status(200).json({ message: "Berhasil mengupdate status turnamen", tournament });
+        res
+          .status(200)
+          .json({ message: "Berhasil mengupdate status turnamen", tournament });
       })
       .catch(next);
   }
@@ -242,243 +255,286 @@ class panitiaController {
   static changeToApproved(req, res, next) {
     const { userId } = req.params;
     User.findById(userId)
-    .populate("tournament_approved")
+      .populate("tournament_approved")
       .then((user) => {
-        if(user.teams == null){
+        if (user.teams == null) {
           res.status(400).json({ message: "user belum terdapat dalam Team!" });
-        }
-        else if(user.tournament_register == null){
-          res.status(400).json({ message: "user belum melakukan registrasi tournament!" });
-        }
-        else{
+        } else if (user.tournament_register == null) {
+          res
+            .status(400)
+            .json({ message: "user belum melakukan registrasi tournament!" });
+        } else {
           user.tournament_approved = user.tournament_register;
           user.save();
-          User.find({teams: user.teams})
-          .then(member =>{
-            // console.log(member)
-            //if lagi
-            for (let i = 0; i < member.length; i++) {
-              member[i].tournament_approved = user.tournament_register;
-              member[i].save();
-            }
-          })
-          .catch(next);
+          User.find({ teams: user.teams })
+            .then((member) => {
+              for (let i = 0; i < member.length; i++) {
+                member[i].tournament_approved = user.tournament_register;
+                member[i].save();
+              }
+            })
+            .catch(next);
           const match = new Match({
             tournament: user.tournament_approved,
-            team: user.teams
+            team: user.teams,
           });
           match.save();
-          res.status(200).json({ message: "Berhasil mengupdate status menjadi Approved", user });
+          res
+            .status(200)
+            .json({
+              message: "Berhasil mengupdate status menjadi Approved",
+              user,
+            });
         }
       })
       .catch(next);
   }
 
-  static getTheMatch(req, res, next){
-    Match.find({tournament: req.params.tournamentId})
-    .populate("tournament")
-    .populate("team")
-    .then(match =>{
-      if(match.length == 0){
-        res.status(400).json({ message: "Nobody registered!" });
-      }else{
-        // console.log(match)
-        res.status(200).json({
-          match
-        });
-      }
-    })
+  static getTheMatch(req, res, next) {
+    Match.find({ tournament: req.params.tournamentId })
+      .populate("tournament")
+      .populate("team")
+      .then((match) => {
+        if (match.length == 0) {
+          res.status(400).json({ message: "Nobody registered!" });
+        } else {
+          res.status(200).json({
+            match,
+          });
+        }
+      });
   }
 
-  static getTheTeamMatch(req, res, next){
-    Match.find({tournament: req.params.tournamentId, match_round: req.params.matchRound })
-    .populate("tournament")
-    .populate("team")
-    .then(match =>{
-      if(match.length == 0){
-        res.status(400).json({ message: "Nobody registered!" });
-      }else{
-        res.status(200).json({
-          match
-        });
-      }
+  static getTheTeamMatch(req, res, next) {
+    Match.find({
+      tournament: req.params.tournamentId,
+      match_round: req.params.matchRound,
     })
+      .populate("tournament")
+      .populate("team")
+      .then((match) => {
+        if (match.length == 0) {
+          res.status(400).json({ message: "Nobody registered!" });
+        } else {
+          res.status(200).json({
+            match,
+          });
+        }
+      });
   }
 
-  static inputScoreMatch(req, res, next){
-    const {team, score, match_round} = req.body
-    Match.findOne({team: team, match_round: match_round})
-    .populate("tournament")
-    .populate("team")
-    .then(user => {
-      // console.log(user);
-      if(user.score == null){
-        res.status(400).json({ message: "input user score!" });
-      }else{
-        user.score = score;
-        user.save();
-        res.status(200).json({message: "Score updated!"});
-      }
-    })
-    .catch(next);
+  static inputScoreMatch(req, res, next) {
+    const { team, score, match_round } = req.body;
+    Match.findOne({ team: team, match_round: match_round })
+      .populate("tournament")
+      .populate("team")
+      .then((user) => {
+        if (user.score == null) {
+          res.status(400).json({ message: "input user score!" });
+        } else {
+          user.score = score;
+          user.save();
+          res.status(200).json({ message: "Score updated!" });
+        }
+      })
+      .catch(next);
   }
 
-  static changeStatusEliminateTeam(req, res, next){
-    const {team} = req.body
-    Match.findOne({team: team})
-    .populate("tournament")
-    .populate("team")
-    .then(user => {
-      // console.log(typeof user.isEliminate);
-      if(user.isEliminate == 0){
-        user.isEliminate = 1;
-        user.save();
-        res.status(200).json({ message: "status eliminated True!" });
-      }else{
-        user.isEliminate = 0;
-        user.save();
-        res.status(200).json({message: "status eliminated False!"});
-      }
-    })
-    .catch(next);
+  static changeStatusEliminateTeam(req, res, next) {
+    const { team } = req.body;
+    Match.findOne({ team: team })
+      .populate("tournament")
+      .populate("team")
+      .then((user) => {
+        if (user.isEliminate == 0) {
+          user.isEliminate = 1;
+          user.save();
+          res.status(200).json({ message: "status eliminated True!" });
+        } else {
+          user.isEliminate = 0;
+          user.save();
+          res.status(200).json({ message: "status eliminated False!" });
+        }
+      })
+      .catch(next);
   }
 
-  static checkThirdWinnerMatch(req, res, next){
-    const {tournamentId} = req.params;
-    const {match_round} = req.body
-    Match.find({tournament: tournamentId, match_round: match_round-1, isEliminate: true})
-    .then(match =>{
-      // console.log(match);
+  static checkThirdWinnerMatch(req, res, next) {
+    const { tournamentId } = req.params;
+    const { match_round } = req.body;
+    Match.find({
+      tournament: tournamentId,
+      match_round: match_round - 1,
+      isEliminate: true,
+    }).then((match) => {
       for (let i = 0; i < match.length; i++) {
-        Match.create({tournament: tournamentId, team: match[i].team, match_round: match[i].match_round+=1, isEliminate: true})
+        Match.create({
+          tournament: tournamentId,
+          team: match[i].team,
+          match_round: (match[i].match_round += 1),
+          isEliminate: true,
+        });
       }
       res.status(200).json(match);
-    })
-    .catch
-
+    }).catch;
   }
 
-  static checkEliminate(req, res, next){
-    const {tournamentId} = req.params;
-    const {match_round} = req.body
-    Match.find({tournament: tournamentId, match_round: match_round})
-    .then((match) => {
-      if(match.length <= 2){
-        res.status(204).json({message: "this is the last Match"});
-        return;
-      }else{
-        for (let i = 0; i <= match.length; i+=2) {
-          // console.log(i)
-            if(match[i] == match[match.length]){
+  static checkEliminate(req, res, next) {
+    const { tournamentId } = req.params;
+    const { match_round } = req.body;
+    Match.find({ tournament: tournamentId, match_round: match_round })
+      .then((match) => {
+        if (match.length <= 2) {
+          res.status(204).json({ message: "this is the last Match" });
+          return;
+        } else {
+          for (let i = 0; i <= match.length; i += 2) {
+            if (match[i] == match[match.length]) {
               Tournament.findById(tournamentId)
-              .then(tournament =>{
-                tournament.match_round += 1;
-                console.log("tournament.match_round", tournament.match_round)
-                tournament.save();
-              })
-              .catch(next);
-            }else
-            if(match[i] == match[match.length-1]){
-              console.log(true);
-              Match.create({tournament: tournamentId, team: match[i].team, match_round: match[i].match_round+=1})
-            }else{
-              if(match[i].score > match[i+1].score){
-                console.log(true)
-                Match.create({tournament: tournamentId, team: match[i].team, match_round: match[i].match_round+=1})
-                match[i+1].isEliminate= 1;
-                match[i+1].save();
-              }else{
-                console.log(false)
-                Match.create({tournament: tournamentId, team: match[i+1].team, match_round: match[i+1].match_round+=1})
-                match[i].isEliminate= 1;
+                .then((tournament) => {
+                  tournament.match_round += 1;
+                  console.log("tournament.match_round", tournament.match_round);
+                  tournament.save();
+                })
+                .catch(next);
+            } else if (match[i] == match[match.length - 1]) {
+              Match.create({
+                tournament: tournamentId,
+                team: match[i].team,
+                match_round: (match[i].match_round += 1),
+              });
+            } else {
+              if (match[i].score > match[i + 1].score) {
+                Match.create({
+                  tournament: tournamentId,
+                  team: match[i].team,
+                  match_round: (match[i].match_round += 1),
+                });
+                match[i + 1].isEliminate = 1;
+                match[i + 1].save();
+              } else {
+                Match.create({
+                  tournament: tournamentId,
+                  team: match[i + 1].team,
+                  match_round: (match[i + 1].match_round += 1),
+                });
+                match[i].isEliminate = 1;
                 match[i].save();
               }
             }
+          }
         }
-      }
 
-      Tournament.findById(tournamentId)
-      .then(tournament =>{
-        tournament.match_round += 1;
-        console.log("tournament.match_round", tournament.match_round)
-        tournament.save();
+        Tournament.findById(tournamentId)
+          .then((tournament) => {
+            tournament.match_round += 1;
+            console.log("tournament.match_round", tournament.match_round);
+            tournament.save();
+          })
+          .catch(next);
+        res.status(200).json({ message: "eliminate updated" });
       })
       .catch(next);
-      res.status(200).json({message: "eliminate updated"});
-    })
-    .catch(next);
   }
 
-
-  static async tournamentAllDistrict (req,res,next){
+  static async tournamentAllDistrict(req, res, next) {
     console.log("coba");
-    const {page = 1, limit = 10, q = ''} = req.query;
+    const { page = 1, limit = 10, q = "" } = req.query;
     const url_local = "http://localhost:8080";
     try {
-        const tournament = await Tournament.find({ tournament_name: { '$regex': q, '$options': 'i' }, districts: req.userDistrict })
-            .sort({tournament_name:1})
-            .populate("districts")
-            .limit(limit * 1)
-            .skip((page - 1) * limit)
-            .exec()
-        console.log(tournament);
-        const nextpage = parseInt(page) + parseInt('1')
-        const previouspage = parseInt(page) - parseInt('1')
-        const jumlahData = await Tournament.countDocuments({ tournament_name: { '$regex': q, '$options': 'i' } })
-        const jumlahPage = Math.ceil(jumlahData / limit)
-        var npg, ppg
-        if(parseInt(page) === parseInt(jumlahPage) && parseInt(page) === 1){
-            npg = null
-            ppg = null
-        } else if(parseInt(page) === parseInt(jumlahPage)){
-            ppg = url_local + '/tournament/all?page=' + previouspage
-            npg = null
-        } else if(parseInt(page) === 1){
-            npg = url_local + '/tournament/all?page=' + nextpage
-            ppg = null
-        } else {
-            npg = url_local + '/tournament/all?page=' + nextpage
-            ppg = url_local + '/tournament/all?page=' + previouspage
-        }
-        res.status(200).json({tournament, page:page, totalpage:jumlahPage, nextpages:npg, previouspages:ppg});
+      const tournament = await Tournament.find({
+        tournament_name: { $regex: q, $options: "i" },
+        districts: req.userDistrict,
+      })
+        .sort({ tournament_name: 1 })
+        .populate("districts")
+        .limit(limit * 1)
+        .skip((page - 1) * limit)
+        .exec();
+      console.log(tournament);
+      const nextpage = parseInt(page) + parseInt("1");
+      const previouspage = parseInt(page) - parseInt("1");
+      const jumlahData = await Tournament.countDocuments({
+        tournament_name: { $regex: q, $options: "i" },
+      });
+      const jumlahPage = Math.ceil(jumlahData / limit);
+      var npg, ppg;
+      if (parseInt(page) === parseInt(jumlahPage) && parseInt(page) === 1) {
+        npg = null;
+        ppg = null;
+      } else if (parseInt(page) === parseInt(jumlahPage)) {
+        ppg = url_local + "/tournament/all?page=" + previouspage;
+        npg = null;
+      } else if (parseInt(page) === 1) {
+        npg = url_local + "/tournament/all?page=" + nextpage;
+        ppg = null;
+      } else {
+        npg = url_local + "/tournament/all?page=" + nextpage;
+        ppg = url_local + "/tournament/all?page=" + previouspage;
+      }
+      res
+        .status(200)
+        .json({
+          tournament,
+          page: page,
+          totalpage: jumlahPage,
+          nextpages: npg,
+          previouspages: ppg,
+        });
+    } catch (error) {
+      console.log(error.message);
     }
-    catch(error){console.log(error.message)}
   }
 
-  static async tournamentAllDistrictOngoing (req,res,next){
+  static async tournamentAllDistrictOngoing(req, res, next) {
     console.log("coba");
-    const {page = 1, limit = 10, q = ''} = req.query;
+    const { page = 1, limit = 10, q = "" } = req.query;
     const url_local = "http://localhost:8080";
     try {
-        const tournament = await Tournament.find({ tournament_name: { '$regex': q, '$options': 'i' }, districts: req.userDistrict, is_started: "ongoing" })
-            .sort({tournament_name:1})
-            .populate("districts")
-            .limit(limit * 1)
-            .skip((page - 1) * limit)
-            .exec()
-        console.log(tournament);
-        const nextpage = parseInt(page) + parseInt('1')
-        const previouspage = parseInt(page) - parseInt('1')
-        const jumlahData = await Tournament.countDocuments({ tournament_name: { '$regex': q, '$options': 'i' } })
-        const jumlahPage = Math.ceil(jumlahData / limit)
-        var npg, ppg
-        if(parseInt(page) === parseInt(jumlahPage) && parseInt(page) === 1){
-            npg = null
-            ppg = null
-        } else if(parseInt(page) === parseInt(jumlahPage)){
-            ppg = url_local + '/tournament/all?page=' + previouspage
-            npg = null
-        } else if(parseInt(page) === 1){
-            npg = url_local + '/tournament/all?page=' + nextpage
-            ppg = null
-        } else {
-            npg = url_local + '/tournament/all?page=' + nextpage
-            ppg = url_local + '/tournament/all?page=' + previouspage
-        }
-        res.status(200).json({tournament, page:page, totalpage:jumlahPage, nextpages:npg, previouspages:ppg});
+      const tournament = await Tournament.find({
+        tournament_name: { $regex: q, $options: "i" },
+        districts: req.userDistrict,
+        is_started: "ongoing",
+      })
+        .sort({ tournament_name: 1 })
+        .populate("districts")
+        .limit(limit * 1)
+        .skip((page - 1) * limit)
+        .exec();
+      console.log(tournament);
+      const nextpage = parseInt(page) + parseInt("1");
+      const previouspage = parseInt(page) - parseInt("1");
+      const jumlahData = await Tournament.countDocuments({
+        tournament_name: { $regex: q, $options: "i" },
+      });
+      const jumlahPage = Math.ceil(jumlahData / limit);
+      var npg, ppg;
+      if (parseInt(page) === parseInt(jumlahPage) && parseInt(page) === 1) {
+        npg = null;
+        ppg = null;
+      } else if (parseInt(page) === parseInt(jumlahPage)) {
+        ppg = url_local + "/tournament/all?page=" + previouspage;
+        npg = null;
+      } else if (parseInt(page) === 1) {
+        npg = url_local + "/tournament/all?page=" + nextpage;
+        ppg = null;
+      } else {
+        npg = url_local + "/tournament/all?page=" + nextpage;
+        ppg = url_local + "/tournament/all?page=" + previouspage;
+      }
+      res
+        .status(200)
+        .json({
+          tournament,
+          page: page,
+          totalpage: jumlahPage,
+          nextpages: npg,
+          previouspages: ppg,
+        });
+    } catch (error) {
+      console.log(error.message);
     }
-    catch(error){console.log(error.message)}
-}
+  }
 
   static viewRequestPeserta(req, res, next) {
     TournamentApproved.find()
@@ -529,9 +585,6 @@ class panitiaController {
   static createWinners(req, res, next) {
     const { tournamentId } = req.params;
     const { first_winner, second_winner, third_winner } = req.body;
-    // const firstwinner = JSON.parse(req.body.first_winner);
-    // const secondwinner = JSON.parse(req.body.second_winner);
-    // const thirdwinner = JSON.parse(req.body.third_winner);
 
     if (first_winner && second_winner && third_winner) {
       Team.findOne({ team_name: { $in: first_winner } }).then((first) => {

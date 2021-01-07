@@ -3,7 +3,6 @@ const Role = require("../models/Role.model");
 const District = require("../models/District.model");
 const Team = require("../models/Team.model");
 const Tournament = require("../models/Tournament.model");
-const TournamentApproved = require("../models/TournamentApproved.model");
 const bcrypt = require("bcrypt");
 
 class pesertaController {
@@ -29,16 +28,8 @@ class pesertaController {
     let password = bcrypt.hashSync(req.body.password,8);
     let old_password = bcrypt.hashSync(req.body.old_password,8);
     const updatedData = { password, old_password };
-    console.log(updatedData);
-    // for (let key in updatedData){
-    //     if(!updatedData[key]){
-    //       delete updatedData[key]
-    //     }
-    // }
-    //verifakisi
     User.findById(userId)
       .then((result) => {
-        //   console.log(result);
         var passwordIsValid = bcrypt.compareSync(
           req.body.old_password,
           result.password
@@ -51,13 +42,8 @@ class pesertaController {
         } else {
           User.findByIdAndUpdate(userId, updatedData, { new: true })
             .then((result) => {
-            //   console.log(result);
-            //   const a = bcrypt.hashSync(result.password, 8);
-            //   console.log(a);
-            //   result.old_password == a;
               result.old_password == result.password;
               result.password == req.body.password;
-            //   console.log(result);
               res.status(200).json({
                 message: "Berhasil mengupdate data password",
                 updated: result,
@@ -105,25 +91,11 @@ class pesertaController {
   }
 
   static getTeamPeserta(req,res,next){
-    // console.log();
-    // const { teamId } = req.params
-    // console.log(teamId)
-    // console.log("teamId",typeof(teamId))
-    // Team.findById(req.userTeam)
-    // .exec((err,team)=>{
-    //   if(err){
-    //     res.status(500).json(err)
-    //   } else if (!team){
-    //     res.status(400).json("Tidak ada team")
-    //   } else {
         User.find({teams:req.userTeam})
-        // .populate("teams")
         .then((user)=> {
           res.status(200).json(user)
         })
         .catch(next)
-    //   }
-    // }) 
   }
 
   // static registerTeam(req, res, next) {
@@ -169,7 +141,6 @@ class pesertaController {
 
   static pesertaRegisterTournament(req, res, next) {
     const { permalink } = req.params;
-    // console.log(tournamentId);
     Tournament.findOne({permalink: permalink})
     .populate("districts")
     .then(tournament => {
@@ -184,9 +155,8 @@ class pesertaController {
         .populate("districts")
         .then(user => {
           let ageDifMs = Date.now() - user.birthdate.getTime();
-          let ageDate = new Date(ageDifMs); // miliseconds from epoch
+          let ageDate = new Date(ageDifMs);
           const userAge = Math.abs(ageDate.getUTCFullYear() - 1970);
-          // console.log(userAge);
           if(userAge < tournament.age_minimum){
             console.log("Peserta dibawah umur ketentuan")
             res.status(400).json({success: false, message : "Peserta dibawah umur ketentuan"})
@@ -208,39 +178,11 @@ class pesertaController {
     }).catch(next);
   }
 
-  // static teamRegisterTournament(req, res, next) {
-  //   const { teamId } = req.params;
-  //   const { tournament_name, status } = req.body;
-  //   Team.findById(teamId)
-  //     .then((team) => {
-  //       console.log(team);
-  //       const participant = team;
-  //       TournamentApproved.create(
-  //         { status, tournament_name, participant },
-  //         (err, approved) => {
-  //           if (err) {
-  //             res.status(500).json({ message: err });
-  //             return;
-  //           }
-  //           res.status(200).json({
-  //             message: "berhasil mendaftarkan tim ke tournament",
-  //             approved,
-  //           });
-  //         }
-  //       );
-  //     })
-  //     .catch(next);
-  // }
-
   static pesertaRegisterOtherPesertaToTeam(req, res, next){
-    //user cari temen yang udah register ke turnament itu
-    //user pilih temennya
-    //temennya terdaftar di team itu
     const {username} = req.body;
     User.findOne({username: username})
     .populate("districts")
     .then((member) => {
-      // console.log(member);
       if(member == null){
         res.status(400).json({ message: "username tidak ditemukan" });
       } else if(member.districts._id.toString() !== req.userDistrict._id){
