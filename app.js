@@ -3,8 +3,6 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const mongooseConnect = require("./configs/mongoose.config");
 const cors = require("cors");
-const cookieParser = require('cookie-parser');
-
 global.__basedir = __dirname
 
 const routes = require("./routes");
@@ -15,9 +13,7 @@ app.use(cors());
 
 mongooseConnect();
 
-app.use(cookieParser());
 app.use(bodyParser.json());
-// app.use(formidableMiddleware());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use("/image", express.static(path.join("image")));
 
@@ -33,9 +29,6 @@ app.use((req, res, next) => {
   );
   next();
 });
-// router.get("/", (req, res, next) => {
-  
-// });
 
 app.use(routes);
 

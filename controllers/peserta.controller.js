@@ -1,6 +1,4 @@
 const User = require("../models/User.model");
-const Role = require("../models/Role.model");
-const District = require("../models/District.model");
 const Team = require("../models/Team.model");
 const Tournament = require("../models/Tournament.model");
 const bcrypt = require("bcrypt");
@@ -97,48 +95,6 @@ class pesertaController {
         })
         .catch(next)
   }
-
-  // static registerTeam(req, res, next) {
-  //   const { teams } = req.body;
-
-  //   User.findByIdAndUpdate(req.userId, { teams: teams })
-  //     .then((peserta) => {
-  //       if (req.body.teams) {
-  //         Team.find({ team_name: { $in: req.body.teams } }, (err, team) => {
-  //           if (err) {
-  //             res.status(500).send({ message: "Nama Team Sudah Ada" });
-  //             return;
-  //           }
-  //           team.teams = teams.map((team) => team._id);
-  //         });
-  //       }
-  //       res
-  //         .status(200)
-  //         .json({ message: "Berhasil mendaftar pada team", peserta });
-  //     })
-  //     .catch(next);
-  // }
-
-  // static pesertaRegisterTournament(req, res, next) {
-  //   const { userId } = req.params;
-  //   const { tournament_name, status } = req.body;
-  //   User.findById(userId)
-  //     .then((user) => {
-  //       const participant = user;
-  //       TournamentApproved.create({ status, tournament_name, participant },
-  //         (err, approved) => {
-  //           console.log(req.body.tournament_name);
-  //           if (err) {
-  //             res.status(500).json({ message: err });
-  //             return;
-  //           }
-  //           res.status(201).json({ message: "berhasil gabung tim", approved });
-  //         }
-  //       );
-  //     })
-  //     .catch(next);
-  // }
-
   static pesertaRegisterTournament(req, res, next) {
     const { permalink } = req.params;
     Tournament.findOne({permalink: permalink})

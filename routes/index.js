@@ -5,7 +5,6 @@ const lurahRoutes = require ("./lurah.routes");
 const panitiaRoutes = require ("./panitia.routes");
 const pesertaRoutes = require ("./peserta.routes");
 const tournamentRoutes = require ('./tournament.routes');
-const matchRoutes = require ("./match.routes");
 
 routes.use("/auth", authRoutes);
 routes.use("/admin", adminRoutes);
@@ -13,8 +12,5 @@ routes.use("/lurah", lurahRoutes);
 routes.use("/panitia", panitiaRoutes);
 routes.use("/peserta", pesertaRoutes);
 routes.use("/tournament", tournamentRoutes);
-routes.use("/match", matchRoutes);
-
-
 
 module.exports = routes;

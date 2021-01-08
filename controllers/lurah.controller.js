@@ -1,6 +1,4 @@
 const User = require("../models/User.model");
-const Role = require("../models/Role.model");
-const District = require("../models/District.model");
 const bcrypt = require("bcrypt");
 const Tournament = require("../models/Tournament.model");
 
@@ -37,7 +35,6 @@ class lurahController {
   }
 
   static createPanitia(req, res, next) {
-    // const {userId} = req.params.userId;
     const user = new User({
       username: req.body.username,
       email: req.body.email,
@@ -47,63 +44,26 @@ class lurahController {
       role_name: "panitia",
       districts: req.userDistrict,
     });
-    // var districtss,roless
     var districtss;
-
-    // User.findById(req.userId)
-    //         .populate("districts")
-    //         .then(user => {
-    //             districtss = user.districts.district_name;
-    //             console.log(districtss);
-    //             user.save().then(userss=>{
-    //                 userss.districts = districtss
-
-    //                 // userss.roles[0] = roless
-    //                 // console.log(userss.roles);
-    //                 res.status(201).json({ message: "Berhasil membuat panitia", userss });
-    //             })
-    //         }).catch(next);
 
     user.save((err, user) => {
       if (err) {
         res.status(500).send({ message: err });
         return;
       }
-      // if(req.body.roles && req.body.districts){
-      // Role.findOne({role_name: "panitia"})
-      // .then(role=>{
-      //     user.roles = [role._id];
-      //     roless = role.role_name;
-      // });
 
       User.findById(req.userId)
         .populate("districts")
         .then((user) => {
           districtss = user.districts.district_name;
-          // console.log(districtss);
           user.save().then((userss) => {
             userss.districts = districtss;
-            // userss.roles[0] = roless
-            // console.log(userss.roles);
             res
               .status(201)
               .json({ message: "Berhasil membuat panitia", userss });
           });
         })
-
-        // District.findOne({district_name:req.body.districts})
-        // .then(district=>{
-        //     user.districts = district._id;
-        //     districtss = district.district_name;
-        //     user.save().then(userss=>{
-        //         userss.districts = districtss
-        //         // userss.roles[0] = roless
-        //         // console.log(userss.roles);
-        //         res.status(201).json({ message: "Berhasil membuat panitia", userss });
-        //     })
-        // })
         .catch(next);
-      // }
     });
   }
 
@@ -123,40 +83,6 @@ class lurahController {
       })
       .catch(next);
   }
-
-  // static async dataTournamentByDistrict (req,res,next){
-  //     const {page = 1, limit = 10, q = ''} = req.query;
-  //     const url_local = "http://localhost:8080";
-  //     try {
-  //         const tournament = await Tournament.find({ tournament_name: { '$regex': q, '$options': 'i' }, districts: req.userDistrict })
-  //             .sort({tournament_name:1})
-  //             .populate("districts")
-  //             .limit(limit * 1)
-  //             .skip((page - 1) * limit)
-  //             .exec()
-  //         console.log(tournament);
-  //         const nextpage = parseInt(page) + parseInt('1')
-  //         const previouspage = parseInt(page) - parseInt('1')
-  //         const jumlahData = await Tournament.countDocuments({ tournament_name: { '$regex': q, '$options': 'i' } })
-  //         const jumlahPage = Math.ceil(jumlahData / limit)
-  //         var npg, ppg
-  //         if(parseInt(page) === parseInt(jumlahPage) && parseInt(page) === 1){
-  //             npg = null
-  //             ppg = null
-  //         } else if(parseInt(page) === parseInt(jumlahPage)){
-  //             ppg = url_local + '/tournament/all?page=' + previouspage
-  //             npg = null
-  //         } else if(parseInt(page) === 1){
-  //             npg = url_local + '/tournament/all?page=' + nextpage
-  //             ppg = null
-  //         } else {
-  //             npg = url_local + '/tournament/all?page=' + nextpage
-  //             ppg = url_local + '/tournament/all?page=' + previouspage
-  //         }
-  //         res.status(200).json({tournament, page:page, totalpage:jumlahPage, nextpages:npg, previouspages:ppg});
-  //     }
-  //     catch(error){console.log(error.message)}
-  //   }
 }
 
 module.exports = lurahController;

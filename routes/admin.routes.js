@@ -16,12 +16,9 @@ routes.put("/update", adminController.updateAdmin);
 routes.put("/update-password", adminController.changePassword);
 routes.get("/get/:userId", adminController.getAdminId);
 routes.post("/create-lurah", verifySignUp.checkDuplicateUsernameOrEmail, adminController.createLurah);
-routes.post("/create-role", adminController.createRole);
 routes.post("/create-district", adminController.createDistrict);
 routes.get("/data-lurah", adminController.dataLurah);
 routes.post("/data-user-filter", adminController.filterDataUser);
-// routes.get("/data-lurah-district", adminController.dataLurahDistrict);
-routes.get("/data-role", adminController.dataRole);
 routes.get("/data-district", adminController.dataDistrict);
 routes.get("/data-user-all", adminController.dataUserAll);
 

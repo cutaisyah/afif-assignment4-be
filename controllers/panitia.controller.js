@@ -1,7 +1,5 @@
 const User = require("../models/User.model");
 const Tournament = require("../models/Tournament.model");
-const TournamentApproved = require("../models/TournamentApproved.model");
-const TournamentPrize = require("../models/TournamentPrize.model");
 const Team = require("../models/Team.model");
 const Game = require("../models/Game.model");
 const Match = require("../models/Match.model");
@@ -534,52 +532,6 @@ class panitiaController {
     } catch (error) {
       console.log(error.message);
     }
-  }
-
-  static viewRequestPeserta(req, res, next) {
-    TournamentApproved.find()
-      .then((approved) => {
-        res.status(200).json({
-          message: "berhasil mendapat list request peserta",
-          approved,
-        });
-      })
-      .catch(next);
-  }
-
-  static responseRequestPeserta(req, res, next) {
-    const { approvedId } = req.params;
-    const { status } = req.body;
-    const updatedData = { status };
-    TournamentApproved.findByIdAndUpdate(approvedId, updatedData, { new: true })
-      .then((panitia) => {
-        res.status(200).json({
-          message: "Berhasil memberikan respon kepada peserta",
-          updated: panitia,
-        });
-      })
-      .catch(next);
-  }
-
-  static createPrizes(req, res, next) {
-    const {
-      tournament_name,
-      first_prize,
-      second_prize,
-      third_prize,
-    } = req.body;
-    TournamentPrize.create({
-      tournament_name,
-      first_prize,
-      second_prize,
-      third_prize,
-    })
-      .then((result) => {
-        res
-          .status(201)
-          .json({ message: "Berhasil membuat hadiah pada tournament", result });
-      })
-      .catch(next);
   }
 
   static createWinners(req, res, next) {

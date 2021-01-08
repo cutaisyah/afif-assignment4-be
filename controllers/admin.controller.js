@@ -1,10 +1,8 @@
 const User = require("../models/User.model");
-const Role = require("../models/Role.model");
 const District = require("../models/District.model");
 const bcrypt = require("bcrypt");
 
 class adminController {
-  //untuk mnedaftar sbg admin
   static signUpAdmin(req, res, next) {
     const user = new User({
       username: req.body.username,
@@ -14,19 +12,12 @@ class adminController {
       phone: req.body.phone,
       role_name: "admin",
     });
-    // var districtss, roless;
     var districtss;
     user.save((err, user) => {
       if (err) {
         res.status(500).send({ message: err });
         return;
       }
-      //   if (req.body.roles && req.body.districts) {
-      // Role.findOne({ role_name: "admin" }).then((role) => {
-      //   user.roles = [role._id];
-      //   roless = role.role_name;
-      //   console.log(role);
-      // });
       District.findOne({ district_name: req.body.districts })
         .then((district) => {
           console.log(district);
@@ -34,14 +25,12 @@ class adminController {
           districtss = district.district_name;
           user.save().then((userss) => {
             userss.districts = districtss;
-            //   userss.roles[0] = roless;
             res
               .status(201)
               .json({ message: "Anda telah berhasil menjadi admin", userss });
           });
         })
         .catch(next);
-      //   }
     });
   }
 
@@ -70,7 +59,6 @@ class adminController {
     const updatedData = { password, old_password };
     User.findById(userId)
       .then((result) => {
-        //   console.log(result);
         var passwordIsValid = bcrypt.compareSync(
           req.body.old_password,
           result.password
@@ -117,7 +105,6 @@ class adminController {
       phone: req.body.phone,
       role_name: "lurah",
     });
-    // var districtss,roless
     var districtss;
     user.save((err, user) => {
       if (err) {
@@ -139,15 +126,6 @@ class adminController {
     });
   }
 
-  static createRole(req, res, next) {
-    const { role_name } = req.body;
-    Role.create({ role_name })
-      .then((role) => {
-        res.status(201).json({ message: "Role berhasil ditambahkan", role });
-      })
-      .catch(next);
-  }
-
   static createDistrict(req, res, next) {
     const { district_name } = req.body;
     if(district_name == null){
@@ -164,7 +142,7 @@ class adminController {
   static dataLurah(req, res, next) {
     User.find({ role_name: "lurah" })
       .populate("roles")
-      .sort({ username: 1 }) // ASC : 1 -- DES:-1
+      .sort({ username: 1 })
       .then((result) => {
         res
           .status(200)
@@ -180,21 +158,11 @@ class adminController {
     User.find({ $and: [{ districts: district }, { roles: role }] })
       .populate("roles")
       .populate("districts")
-      .sort({ username: 1 }) // ASC : 1 -- DES:-1
+      .sort({ username: 1 })
       .then((result) => {
         res
           .status(200)
           .json({ message: "Berhasil mendapatkan list semua user", result });
-      })
-      .catch(next);
-  }
-
-  static dataRole(req, res, next) {
-    Role.find()
-      .then((role) => {
-        res
-          .status(200)
-          .json({ message: "Berhasil mendapatkan list semua role", role });
       })
       .catch(next);
   }

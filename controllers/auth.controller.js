@@ -220,7 +220,6 @@ class authController {
   static forgotPassword(req, res) {
     const { email } = req.body;
     User.findOne({ email }, (err, user) => {
-      console.log(user);
       if (!user) {
         return res.status(400).json({ message: "Pengguna tidak ditemukan" });
       }

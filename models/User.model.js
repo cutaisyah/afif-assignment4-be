@@ -3,7 +3,6 @@ const validator = require("validator");
 
 
 const userSchema = new mongoose.Schema({
-  // roles: {type:  mongoose.Schema.Types.ObjectId, ref: "Role"},
   role_name: { type: String, enum: ["admin", "lurah", "panitia", "peserta"] },
   username: {type: String, unique: true, required: true},
   email: {
