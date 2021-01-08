@@ -43,7 +43,7 @@ const userSchema = new mongoose.Schema({
   tournament_approved: {type: mongoose.Schema.Types.ObjectId, ref: "Tournament", default: null}, 
   districts: {type: String, ref: "District"},
   teams: {type: mongoose.Schema.Types.ObjectId, ref: "Team", default: null},
-  resetLink: {data: String, default: ''}
+  reset_link: {data: String, default: ''}
   
 });
 

@@ -2,14 +2,10 @@ const User = require("../models/User.model");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const mailgun = require("mailgun-js");
-const lodash = require("lodash");
-const DOMAIN = "sandbox1221511010a04e7aa8eeddf81e8c8006.mailgun.org";
 require('dotenv').config();
 const mg = mailgun({
-  // apiKey: "b1230b9d1b8c3c69a2e09a72f288933b-3d0809fb-441e846b",
   apiKey: process.env.API_KEY,
-  publicApiKey: "pubkey-4231788d1468b87ae2b1fce7a39e7b9e",
-  domain: DOMAIN,
+  domain: process.env.DOMAIN_MG,
 });
 const {
   limiterConsecutiveFailsByUsername,
@@ -41,24 +37,6 @@ class authController {
         });
       });
   }
-
-  // static activatePeserta(req, res) {
-  //   const { token } = req.params;
-  //   if (token) {
-  //     jwt.verify(token, "Assignment4", function (err, decodedToken) {
-  //       if (err) {
-  //         return res
-  //           .status(400)
-  //           .json({ message: "Link salah atau sudah kadaluarsa" });
-  //       }
-  //       res
-  //         .status(200)
-  //         .json({ message: "Akun berhasil diaktivasi", decodedToken });
-  //     });
-  //   } else {
-  //     return res.json({ message: "Upps maaf sedang ada masalah nih" });
-  //   }
-  // }
 
   static async test(req, res, next) {
     async function loginRoute(req, res) {
@@ -256,16 +234,13 @@ class authController {
                     <p>http://localhost:4200/forgot/resetPass/${token}</p>
                 `,
       };
-      // console.log(data);
-      return user.updateOne({ resetLink: token }, function (err, success) {
+      return user.updateOne({ reset_link: token }, function (err, success) {
         if (err) {
-          return res
-            .status(400)
-            .json({ message: "link reset password tidak bisa digunakan" });
+          return res.status(400).json({ message: "link reset password tidak bisa digunakan" });
         } else {
           mg.messages().send(data, function (error, body) {
             if (error) {
-              return res.json({ message: error });
+              return res.json({ message: "mailgun setting bermasalah" });
             }
             return res.json({
               message:

@@ -19,7 +19,7 @@ routes.post("/test", authController.test);
 routes.post("/signin", authController.signIn);
 
 routes.put("/forgot-password", authController.forgotPassword);
-routes.put("/reset-password/:old_password", authController.resetPassword);
+routes.put("/reset-password/:reset_link", authController.resetPassword);
 
 
 
