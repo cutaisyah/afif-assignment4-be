@@ -95,6 +95,7 @@ class pesertaController {
         })
         .catch(next)
   }
+  
   static pesertaRegisterTournament(req, res, next) {
     const { permalink } = req.params;
     Tournament.findOne({permalink: permalink})
@@ -117,7 +118,7 @@ class pesertaController {
             console.log("Peserta dibawah umur ketentuan")
             res.status(400).json({success: false, message : "Peserta dibawah umur ketentuan"})
           }
-          else if(user.districts !== tournament.districts){
+          else if(user.districts._id !== tournament.districts._id){
             res.status(400).json({success: false, message: "District peserta tidak sama dengan District tournament."})
           }
           else if(user.tournament_register !== null){
