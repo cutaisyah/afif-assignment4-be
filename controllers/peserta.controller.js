@@ -117,12 +117,17 @@ class pesertaController {
             console.log("Peserta dibawah umur ketentuan")
             res.status(400).json({success: false, message : "Peserta dibawah umur ketentuan"})
           }
+          else if(user.districts !== tournament.districts){
+            res.status(400).json({success: false, message: "District peserta tidak sama dengan District tournament."})
+          }
           else if(user.tournament_register !== null){
             console.log("Peserta Sudah Pernah Terdaftar")
             res.status(400).json({success: false, message : "Peserta Sudah Pernah Terdaftar"})
-          }else if(req.userRole == "admin" || req.userRole == "panitia" || req.userRole == "lurah" ){
+          }
+          else if(req.userRole == "admin" || req.userRole == "panitia" || req.userRole == "lurah" ){
             res.status(400).json({success: false, message : "Hanya Peserta Yang Dapat Mendaftar"})
-          } else {
+          }
+          else {
             user.tournament_register = tournament._id;
             ++tournament.register_total_participant;
             user.save();
