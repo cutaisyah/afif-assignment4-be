@@ -227,10 +227,17 @@ class panitiaController {
       { is_started: "ongoing" },
       { new: true }
     )
-      .then((tournament) => {
-        res
-          .status(200)
-          .json({ message: "Berhasil mengupdate status turnamen", tournament });
+      .then(tournament => {
+        //if user not approved.. still can changes other tournament.
+        // User.find({districts: tournament.districts.toString(), tournament_register: tournament.tournament_register, tournament_approved: null})
+        // .then(user => {
+        //   for (const i in user) {
+        //     user[i].tournament_register == null;
+        //   }
+        //   user.save();
+        // })
+        // .catch(next);
+        res.status(200).json({ message: "Berhasil mengupdate status turnamen", tournament });
       })
       .catch(next);
   }
