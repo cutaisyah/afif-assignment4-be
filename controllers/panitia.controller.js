@@ -228,7 +228,7 @@ class panitiaController {
       { new: true }
     )
       .then(tournament => {
-        //if user not approved.. still can changes other tournament.
+        // // if user not approved.. still can changes other tournament.
         // User.find({districts: tournament.districts.toString(), tournament_register: tournament.tournament_register, tournament_approved: null})
         // .then(user => {
         //   for (const i in user) {
