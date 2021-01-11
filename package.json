@@ -2,7 +2,7 @@
   "name": "assignment4",
   "version": "1.0.0",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha",
     "start": "nodemon server.js"
   },
   "description": "",
@@ -29,7 +29,11 @@
     "redis": "^3.0.2",
     "validator": "^13.5.2"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
+    "mocha": "^8.2.1"
+  },
   "engines": {
     "node": "12.18.3",
     "npm": "6.14.9"
