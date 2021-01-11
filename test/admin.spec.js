@@ -49,8 +49,8 @@ describe("Admin Routes", ()=>{
 
     describe("Update Admin", () => {
         it("It should Update an admin data", (done) => {
-            const taskId = 1;
-            const task = {
+            const userId = 1;
+            const user = {
                 username: "ali",
                 email: "ali@mail.com",
                 birthdate: 12-12-2012,
@@ -58,8 +58,8 @@ describe("Admin Routes", ()=>{
 
             };
             chai.request(server)                
-                .put("/api/tasks/" + taskId)
-                .send(task)
+                .put("/admin/update/" + userId)
+                .send(user)
                 .end((err, response) => {
                     response.should.have.status(200);
                     response.body.should.be.a('object');
@@ -73,14 +73,14 @@ describe("Admin Routes", ()=>{
         });
 
         it("It should NOT UPDATE an admin data", (done) => {
-            const taskId = 1;
-            const task = {
+            const userId = 1;
+            const user = {
                 name: "Ta",
                 completed: true
             };
             chai.request(server)                
-                .put("/api/tasks/" + taskId)
-                .send(task)
+                .put("/admin/update/" + userId)
+                .send(user)
                 .end((err, response) => {
                     response.should.have.status(400);
                     response.text.should.be.eq("The name should be at least 3 chars long!");
