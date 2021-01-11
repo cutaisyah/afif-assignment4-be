@@ -3,9 +3,6 @@ const Tournament = require("../models/Tournament.model");
 const Team = require("../models/Team.model");
 const Game = require("../models/Game.model");
 const Match = require("../models/Match.model");
-const bcrypt = require("bcrypt");
-const { result } = require("lodash");
-const { response } = require("express");
 
 class panitiaController {
   static updatePanitia(req, res, next) {
@@ -58,7 +55,7 @@ class panitiaController {
       .catch(next);
   }
 
-  static  async createGame(req, res, next) {
+  static async createGame(req, res, next) {
     const { game_name } = req.body;
     console.log(game_name);
     const games = await Game.findOne({game_name:req.body.game_name})
