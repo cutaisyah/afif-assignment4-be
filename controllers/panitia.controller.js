@@ -120,7 +120,7 @@ class panitiaController {
     Tournament.find({$and: [{ districts: district._id }, { tournament_name: tournament_name }]})
     .then((data) => {
       if (data.length == 0) {
-        if (permalink) {
+        if (data.permalink == permalink) {
           res.status(400).json({message: "Permalink telah digunakan"});
           return;
         }else{
