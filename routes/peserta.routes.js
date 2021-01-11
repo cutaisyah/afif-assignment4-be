@@ -1,6 +1,7 @@
 const routes = require ("express").Router();
 const pesertaController = require ("../controllers/peserta.controller");
 const authJwt = require ("../middlewares/authJwt");
+const verifySignUp = require("../middlewares/verifySignUp");
 
 routes.use((req,res,next)=>{
     res.header(
@@ -11,7 +12,7 @@ routes.use((req,res,next)=>{
 });
 
 routes.use(authJwt.verifyToken);
-routes.put("/update", pesertaController.updatePeserta);
+routes.put("/update", verifySignUp.checkDuplicate, pesertaController.updatePeserta);
 routes.put("/update-password", pesertaController.changePassword);
 routes.get("/get/:userId", pesertaController.getPesertaId);
 routes.post("/create-team", pesertaController.createTeam);

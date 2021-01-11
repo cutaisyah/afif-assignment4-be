@@ -1,7 +1,6 @@
 const routes = require ("express").Router();
 const panitiaController = require ("../controllers/panitia.controller");
 const authJwt = require ("../middlewares/authJwt");
-const verifyTournament = require("../middlewares/verifyTournament");
 const verifySignUp = require ("../middlewares/verifySignUp");
 const extractFile = require("../middlewares/file");
 
@@ -41,10 +40,5 @@ routes.get("/allbaseondistrictongoing", panitiaController.tournamentAllDistrictO
 routes.get("/findtournamentgame/:game", panitiaController.findTournamentBasedOnGame);
 
 routes.put("/create-winners/:tournamentId", panitiaController.createWinners);
-
-routes.get("/cekdis", verifyTournament.checkDistrict)
-
-
-
 
 module.exports = routes;
