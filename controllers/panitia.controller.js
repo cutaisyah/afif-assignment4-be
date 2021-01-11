@@ -56,9 +56,7 @@ class panitiaController {
   }
 
   static async createGame(req, res, next) {
-    const { game_name } = req.body;
-    console.log(game_name);
-    const games = await Game.findOne({game_name:req.body.game_name})
+    const games = await Game.findOne({game_name: req.body.game_name})
     if (games){
       if (games.game_name){
         res.status(400).send({message:'Game sudah dibuat'})
@@ -69,7 +67,7 @@ class panitiaController {
         return
       }
     } else if(!games) {
-      Game.create({ game_name })
+      Game.create({ game_name: req.body.game_name })
         .then((game) => {
           res
             .status(201)
