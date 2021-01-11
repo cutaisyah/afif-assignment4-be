@@ -35,7 +35,6 @@ class adminController {
   }
 
   static updateAdmin(req, res, next) {
-    const { userId } = req.userId;
     const { username, email, birthdate, phone } = req.body;
     const updatedData = { username, email, birthdate, phone };
     for (let key in updatedData) {
@@ -43,7 +42,7 @@ class adminController {
         delete updatedData[key];
       }
     }
-    User.findByIdAndUpdate(userId, updatedData, { new: true })
+    User.findByIdAndUpdate(req.userId, updatedData, { new: true })
       .then((user) => {
         res
           .status(200)
@@ -127,11 +126,11 @@ class adminController {
   }
 
   static createDistrict(req, res, next) {
-    const { district_name } = req.body;
+    const district_name = req.body;
     if(district_name == null){
       res.status(400).json({ message: "isi nama district terlebih dahulu"});
     }else{
-      District.create({ district_name })
+      District.create({ district_name: district_name.districts.district })
       .then((district) => {
         res.status(201).json({ message: "District berhasil ditambahkan", district });
       })
