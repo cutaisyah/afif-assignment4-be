@@ -70,20 +70,36 @@ class pesertaController {
   static createTeam(req, res, next) {
     const { team_name, team_phone } = req.body;
     const team = new Team({ team_name, team_phone });
-    User.findById(req.userId)
-    .then(user => {
-      if(user.teams !== null){
-        res.status(400).json({ message: "Anda Sudah terdaftar dalam Team"});
-      } 
-      else{
-        team.save()
-        .then((team) => {
-            user.teams = team._id
-            user.save();
-            return res.status(201).json({ message: "Peserta berhasil mendaftarkan team", data: team });
-        })
-        .catch(next);
+    Team.find()
+    .then(checkteam => {
+      for (const i in checkteam) {
+        if(checkteam[i].team_name == team_name ){
+          res.status(400).json({ message: "Nama Team sudah digunakan"});
+          return;
+        }
+        if(checkteam[i].team_phone == team_phone){
+          res.status(400).json({ message: "Nomo Telepon sudah digunakan"});
+          return;
+        }
       }
+
+      User.findById(req.userId)
+      .then(user => {
+        if(user.teams){
+          res.status(400).json({ message: "Anda Sudah terdaftar dalam Team"});
+        } 
+        else{
+          team.save()
+          .then((team) => {
+              user.teams = team._id
+              user.save();
+              return res.status(201).json({ message: "Peserta berhasil mendaftarkan team", data: team });
+          })
+          .catch(next);
+        }
+      })
+      .catch(next);
+
     })
     .catch(next);
   }
@@ -95,7 +111,7 @@ class pesertaController {
         })
         .catch(next)
   }
-  
+
   static pesertaRegisterTournament(req, res, next) {
     const { permalink } = req.params;
     Tournament.findOne({permalink: permalink})

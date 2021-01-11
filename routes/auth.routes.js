@@ -11,7 +11,7 @@ routes.use((req,res,next)=>{
     next();
 });
 
-routes.post("/signup", verifySignUp.checkDuplicateUsernameOrEmail, authController.signUpPeserta);
+routes.post("/signup", verifySignUp.checkDuplicate, authController.signUpPeserta);
 routes.get("/userid", authJwt.verifyToken, authController.getUserId);
 routes.post("/test", authController.test);
 routes.post("/signin", authController.signIn);

@@ -85,39 +85,71 @@ class panitiaController {
   }
 
   static createTournament(req, res, next) {
+    const district = req.userDistrict;
     const url = req.protocol + "://" + req.get("host");
-    Game.findOne({ game_name: req.body.game }, (err, result) => {
-      if (err) {
-        res.status(500).json({ message: err });
-      }
-      const tournament = new Tournament({
-        tournament_name: req.body.tournament_name,
-        permalink: req.body.permalink,
-        categories: req.body.categories,
-        game: result,
-        total_participant: req.body.total_participant,
-        age_minimum: req.body.age_minimum,
-        description: req.body.description,
-        id_user_panitia: req.userId,
-        image: url + "/image/" + req.file.originalname,
-        tournament_is_started: "pending",
-        districts: req.userDistrict,
-      });
+    const {
+      tournament_name,
+      max_total_participant,
+      age_minimum,
+      description,
+      categories,
+      permalink,
+      first_prize,
+      second_prize,
+      third_prize,
+      game,
+    } = req.body;
+    const tournament = new Tournament({
+      id_user_panitia: req.userDistrict,
+      tournament_name: tournament_name,
+      register_total_participant: 0,
+      max_total_participant: max_total_participant,
+      age_minimum: age_minimum,
+      description: description,
+      categories: categories,
+      first_prize: first_prize,
+      second_prize: second_prize,
+      third_prize: third_prize,
+      permalink: permalink,
+      game: game,
+      image: url + "/image/" + req.file.filename,
+      districts: district._id,
+      is_started: "pending",
+    });
 
-      tournament.save((err, tournament) => {
-        if (err) {
-          res.status(500).send({ message: err });
+    Tournament.find({$and: [{ districts: district._id }, { tournament_name: tournament_name }]})
+    .then((data) => {
+      if (data.length == 0) {
+        if (permalink) {
+          res.status(400).json({message: "Permalink telah digunakan"});
           return;
-        }
-        User.findById(req.userId)
-          .populate("districts")
-          .then((user) => {
-            res
-              .status(201)
-              .json({ message: "Berhasil membuat turnament", user });
+        }else{
+          tournament.save()
+          .then((result) => {
+            res.status(200).json({message: "Tournament Berhasil dibuat"})
           })
           .catch(next);
-      });
+        }
+      } else if (data.tournament_name == tournament_name) {
+        res.status(400).json({message: "Nama Tournament telah digunakan"});
+      }
+      else {
+        Tournament.find({$and: [{ districts: district._id }, { game: game }]})
+        .then((game) => {
+          if (game.length == 0) {
+            if (permalink) {
+              res.status(400).json({message: "Permalink telah digunakan"});
+              return;
+            }else{
+              tournament.save().then((result) => {
+                res.status(200).json({ message: "berhasil" });
+              });
+            }
+          } else {
+            res.status(400).json({ message: "Sudah ada" });
+          }
+        });
+      }
     });
   }
 

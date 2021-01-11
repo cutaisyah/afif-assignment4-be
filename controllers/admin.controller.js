@@ -73,52 +73,27 @@ class adminController {
       role_name: "lurah",
       districts: req.body.districts,
     });
-    // var districtss;
-    User.find()
-    .then(userfind => {
-      for (const i in userfind) {
-        if(userfind[i].phone == req.body.phone){
-          res.status(400).send({ message: "Nomor Telepon telah terdaftar" });
-          return;
-        }
+    user.save((err, user) => {
+      if (err) {
+        res.status(500).send({ message: err });
+        return;
       }
-      user.save();
       res.status(201).json({ message: "Lurah berhasil dibuat" });
-    })
-    .catch(next);
-
-    // user.save((err, user) => {
-    //   console.log(user)
-      
-    //   if (err) {
-    //     res.status(500).send({ message: err });
-    //     return;
-    //   }
-    //   District.findOne({ district_name: req.body.districts })
-    //     .then((district) => {
-    //       user.districts = district._id;
-    //       districtss = district.district_name;
-    //       user.save().then((userss) => {
-    //         userss.districts = districtss;
-    //         res
-    //           .status(201)
-    //           .json({ message: "Anda telah berhasil menjadi lurah", userss });
-    //       });
-    //     })
-    //     .catch(next);
-    // });
+    });
   }
 
   static createDistrict(req, res, next) {
     const district_name = req.body;
-    if(district_name == null){
-      res.status(400).json({ message: "isi nama district terlebih dahulu"});
-    }else{
+    if (district_name == null) {
+      res.status(400).json({ message: "isi nama district terlebih dahulu" });
+    } else {
       District.create({ district_name: district_name.districts.district })
-      .then((district) => {
-        res.status(201).json({ message: "District berhasil ditambahkan", district });
-      })
-      .catch(next);
+        .then((district) => {
+          res
+            .status(201)
+            .json({ message: "District berhasil ditambahkan", district });
+        })
+        .catch(next);
     }
   }
 

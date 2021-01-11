@@ -2,6 +2,7 @@ const routes = require ("express").Router();
 const panitiaController = require ("../controllers/panitia.controller");
 const authJwt = require ("../middlewares/authJwt");
 const verifyTournament = require("../middlewares/verifyTournament");
+const verifySignUp = require ("../middlewares/verifySignUp");
 const extractFile = require("../middlewares/file");
 
 routes.use((req,res,next)=>{
@@ -13,13 +14,13 @@ routes.use((req,res,next)=>{
 });
 
 routes.use(authJwt.verifyToken, authJwt.isPanitia);
-routes.put("/update", panitiaController.updatePanitia);
+routes.put("/update", verifySignUp.checkDuplicate, panitiaController.updatePanitia);
 routes.get("/get/:userId", panitiaController.getPanitiaId);
 routes.get("/data-peserta", panitiaController.getDataPesertaRegistered);
 routes.put("/edit-status-to-approved/:userId", panitiaController.changeToApproved);
 
-routes.post("/create-game",panitiaController.createGame);
-routes.post("/create-tournament", extractFile, verifyTournament.verifyDistrict, panitiaController.createTournament);
+routes.post("/create-game", panitiaController.createGame);
+routes.post("/create-tournament", extractFile, panitiaController.createTournament);
 
 routes.put("/edit-tournament/:tournamentId", panitiaController.updateTournament);
 routes.put("/edit-status-tournament-to-ongoing/:tournamentId", panitiaController.changeTournamentStatusOngoing);
