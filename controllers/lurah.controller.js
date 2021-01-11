@@ -13,9 +13,7 @@ class lurahController {
     }
     User.findByIdAndUpdate(req.userId, updatedData, { new: true })
       .then((lurah) => {
-        res
-          .status(200)
-          .json({ message: "Berhasil mengupdate data lurah", updated: lurah });
+        res.status(200).json({ message: "Berhasil mengupdate data lurah", updated: lurah });
       })
       .catch(next);
   }
@@ -40,26 +38,12 @@ class lurahController {
       role_name: "panitia",
       districts: req.userDistrict,
     });
-    var districtss;
-
     user.save((err, user) => {
       if (err) {
         res.status(500).send({ message: err });
         return;
       }
-
-      User.findById(req.userId)
-        .populate("districts")
-        .then((user) => {
-          districtss = user.districts.district_name;
-          user.save().then((userss) => {
-            userss.districts = districtss;
-            res
-              .status(201)
-              .json({ message: "Berhasil membuat panitia", userss });
-          });
-        })
-        .catch(next);
+      res.status(201).json({ message: "Lurah berhasil dibuat" });
     });
   }
 

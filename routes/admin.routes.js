@@ -10,11 +10,11 @@ routes.use((req,res,next)=>{
     );
     next();
 });
-routes.post("/signup", verifySignUp.checkDuplicateUsernameOrEmail, adminController.signUpAdmin);
+routes.post("/signup", verifySignUp.checkDuplicate, adminController.signUpAdmin);
 routes.use(authJwt.verifyToken, authJwt.isAdmin);
 routes.put("/update", adminController.updateAdmin);
 routes.get("/get/:userId", adminController.getAdminId);
-routes.post("/create-lurah", verifySignUp.checkDuplicateUsernameOrEmail, adminController.createLurah);
+routes.post("/create-lurah", verifySignUp.checkDuplicate, adminController.createLurah);
 routes.post("/create-district", adminController.createDistrict);
 routes.get("/data-lurah", adminController.dataLurah);
 routes.post("/data-user-filter", adminController.filterDataUser);

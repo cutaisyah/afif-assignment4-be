@@ -1,7 +1,7 @@
 const routes = require ("express").Router();
 const lurahController = require ("../controllers/lurah.controller");
 const authJwt = require ("../middlewares/authJwt");
-const verifyToken = require ("../middlewares/verifySignUp");
+const verifySignUp = require ("../middlewares/verifySignUp");
 
 routes.use((req,res,next)=>{
     res.header(
@@ -12,9 +12,9 @@ routes.use((req,res,next)=>{
 });
 
 routes.use(authJwt.verifyToken, authJwt.isLurah);
-routes.put("/update", lurahController.updateLurah);
+routes.put("/update", verifySignUp.checkDuplicate, lurahController.updateLurah);
 routes.get("/get/:userId", lurahController.getLurahId);
-routes.post("/create-panitia", verifyToken.checkDuplicateUsernameOrEmail, lurahController.createPanitia);
+routes.post("/create-panitia", verifySignUp.checkDuplicate, lurahController.createPanitia);
 routes.get("/data-panitia", lurahController.dataPanitia);
 
 routes.get("/allbaseondistrict", lurahController.dataTournamentByDistrict);
