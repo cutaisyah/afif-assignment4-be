@@ -27,39 +27,6 @@ class panitiaController {
       .catch(next);
   }
 
-  static changePassword(req, res, next) {
-    const userId = req.userId;
-    let password = bcrypt.hashSync(req.body.password, 8);
-    let old_password = bcrypt.hashSync(req.body.old_password, 8);
-    const updatedData = { password, old_password };
-    console.log(updatedData);
-    User.findById(userId)
-      .then((result) => {
-        var passwordIsValid = bcrypt.compareSync(
-          req.body.old_password,
-          result.password
-        );
-        if (!passwordIsValid) {
-          res.status(400).json({
-            message: "Verifikasi Password tidak sesuai",
-            updated: result,
-          });
-        } else {
-          User.findByIdAndUpdate(userId, updatedData, { new: true })
-            .then((result) => {
-              result.old_password == result.password;
-              result.password == req.body.password;
-              res.status(200).json({
-                message: "Berhasil mengupdate data password",
-                updated: result,
-              });
-            })
-            .catch(next);
-        }
-      })
-      .catch(next);
-  }
-
   static getPanitiaId(req, res, next) {
     const { userId } = req.params;
     User.findById(userId)
