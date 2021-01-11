@@ -18,7 +18,7 @@ routes.get("/get/:userId", panitiaController.getPanitiaId);
 routes.get("/data-peserta", panitiaController.getDataPesertaRegistered);
 routes.put("/edit-status-to-approved/:userId", panitiaController.changeToApproved);
 
-routes.post("/create-game", panitiaController.createGame);
+routes.post("/create-game",panitiaController.createGame);
 routes.post("/create-tournament", extractFile, verifyTournament.verifyDistrict, panitiaController.createTournament);
 
 routes.put("/edit-tournament/:tournamentId", panitiaController.updateTournament);
