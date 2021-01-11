@@ -71,26 +71,42 @@ class adminController {
       birthdate: req.body.birthdate,
       phone: req.body.phone,
       role_name: "lurah",
+      districts: req.body.districts,
     });
-    var districtss;
-    user.save((err, user) => {
-      if (err) {
-        res.status(500).send({ message: err });
-        return;
+    // var districtss;
+    User.find()
+    .then(userfind => {
+      for (const i in userfind) {
+        if(userfind[i].phone == req.body.phone){
+          res.status(400).send({ message: "Nomor Telepon telah terdaftar" });
+          return;
+        }
       }
-      District.findOne({ district_name: req.body.districts })
-        .then((district) => {
-          user.districts = district._id;
-          districtss = district.district_name;
-          user.save().then((userss) => {
-            userss.districts = districtss;
-            res
-              .status(201)
-              .json({ message: "Anda telah berhasil menjadi lurah", userss });
-          });
-        })
-        .catch(next);
-    });
+      user.save();
+      res.status(201).json({ message: "Lurah berhasil dibuat" });
+    })
+    .catch(next);
+
+    // user.save((err, user) => {
+    //   console.log(user)
+      
+    //   if (err) {
+    //     res.status(500).send({ message: err });
+    //     return;
+    //   }
+    //   District.findOne({ district_name: req.body.districts })
+    //     .then((district) => {
+    //       user.districts = district._id;
+    //       districtss = district.district_name;
+    //       user.save().then((userss) => {
+    //         userss.districts = districtss;
+    //         res
+    //           .status(201)
+    //           .json({ message: "Anda telah berhasil menjadi lurah", userss });
+    //       });
+    //     })
+    //     .catch(next);
+    // });
   }
 
   static createDistrict(req, res, next) {
