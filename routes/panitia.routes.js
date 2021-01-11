@@ -42,9 +42,4 @@ routes.get("/findtournamentgame/:game", panitiaController.findTournamentBasedOnG
 
 routes.put("/create-winners/:tournamentId", panitiaController.createWinners);
 
-routes.get("/cekdis", verifyTournament.checkDistrict)
-
-
-
-
 module.exports = routes;
