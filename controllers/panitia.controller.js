@@ -4,20 +4,36 @@ const Team = require("../models/Team.model");
 const Game = require("../models/Game.model");
 const Match = require("../models/Match.model");
 const bcrypt = require("bcrypt");
-const { result } = require("lodash");
-const { response } = require("express");
+const {
+  result
+} = require("lodash");
+const {
+  response
+} = require("express");
 
 class panitiaController {
   static updatePanitia(req, res, next) {
     const userId = req.userId;
-    const { username, email, birthdate, phone } = req.body;
-    const updatedData = { username, email, birthdate, phone };
+    const {
+      username,
+      email,
+      birthdate,
+      phone
+    } = req.body;
+    const updatedData = {
+      username,
+      email,
+      birthdate,
+      phone
+    };
     for (let key in updatedData) {
       if (!updatedData[key]) {
         delete updatedData[key];
       }
     }
-    User.findByIdAndUpdate(userId, updatedData, { new: true })
+    User.findByIdAndUpdate(userId, updatedData, {
+        new: true
+      })
       .then((panitia) => {
         res
           .status(200)
@@ -30,20 +46,28 @@ class panitiaController {
   }
 
   static getPanitiaId(req, res, next) {
-    const { userId } = req.params;
+    const {
+      userId
+    } = req.params;
     User.findById(userId)
       .populate("Roles")
       .populate("districts")
       .then((result) => {
         res
           .status(200)
-          .json({ message: "Berhasil mendapatkan data panitia", data: result });
+          .json({
+            message: "Berhasil mendapatkan data panitia",
+            data: result
+          });
       })
       .catch(next);
   }
 
   static getDataPesertaRegistered(req, res, next) {
-    User.find({ role_name: "peserta", districts: req.userDistrict })
+    User.find({
+        role_name: "peserta",
+        districts: req.userDistrict
+      })
       .populate("roles")
       .populate("districts")
       .populate("tournament_approved")
@@ -58,33 +82,47 @@ class panitiaController {
       .catch(next);
   }
 
-  static  async createGame(req, res, next) {
-    const { game_name } = req.body;
+  static async createGame(req, res, next) {
+    const {
+      game_name
+    } = req.body;
     console.log(game_name);
-    const games = await Game.findOne({game_name:req.body.game_name})
-    if (games){
-      if (games.game_name){
-        res.status(400).send({message:'Game sudah dibuat'})
+    const games = await Game.findOne({
+      game_name: req.body.game_name
+    })
+    if (games) {
+      if (games.game_name) {
+        res.status(400).send({
+          message: 'Game sudah dibuat'
+        })
         return
       }
-      if (games.game_name == null){
-        res.status(400).send({message:'isi nama game terlebih dahulu'})
+      if (games.game_name == null) {
+        res.status(400).send({
+          message: 'isi nama game terlebih dahulu'
+        })
         return
       }
-    } else if(!games) {
-      Game.create({ game_name })
+    } else if (!games) {
+      Game.create({
+          game_name: req.body.game_name
+        })
         .then((game) => {
           res
             .status(201)
-            .json({ message: "game berhasil ditambahkan", game });
+            .json({
+              message: "game berhasil ditambahkan",
+              game
+            });
         })
         .catch(next)
     } else {
       throw next;
-    } 
+    }
   }
 
-  static createTournament(req, res, next) {
+  static async createTournament(req, res, next) {
+    const userId = req.userId
     const district = req.userDistrict;
     const url = req.protocol + "://" + req.get("host");
     const {
@@ -100,7 +138,7 @@ class panitiaController {
       game,
     } = req.body;
     const tournament = new Tournament({
-      id_user_panitia: req.userDistrict,
+      id_user_panitia: req.userId,
       tournament_name: tournament_name,
       register_total_participant: 0,
       max_total_participant: max_total_participant,
@@ -117,47 +155,50 @@ class panitiaController {
       is_started: "pending",
     });
 
-    Tournament.find({$and: [{ districts: district._id }, { tournament_name: tournament_name }]})
-    .then((data) => {
-      if (data.length == 0) {
-        if (data.permalink == permalink) {
-          res.status(400).json({message: "Permalink telah digunakan"});
-          return;
-        }else{
-          tournament.save()
-          .then((result) => {
-            res.status(200).json({message: "Tournament Berhasil dibuat"})
-          })
-          .catch(next);
+    const lomba = await Tournament.find({$and: [{districts: district._id}, {tournament_name: tournament_name}]})
+    const permalinks = await Tournament.findOne({permalink:permalink})
+    const panitia = await Tournament.find({$and:[{id_user_panitia:userId},{game:game}]})
+    const games = await Tournament.find({$and: [{districts: district._id}, {game: game}] })
+    
+    if (lomba.length !== 0) {
+      res.status(400).send({message:"sudah ada perlombaan dengan nama ini"})
+    } else if(lomba.length == 0){
+      if(permalinks){
+        res.status(400).send({message:"Permalink telah digunakan"})
+      } else if(games.length !== 0){
+        if(panitia.length == 0){
+          console.log("wah");
+          res.status(400).send({message:"Tidak boleh ada duplikasi tipe game di 1 distrik !"})
+        } else if (panitia.length !== 0){
+          console.log("wih");
+          tournament.save().then((result) => {
+            res.status(200).json({ message: result });
+          });
         }
-      } else if (data.tournament_name == tournament_name) {
-        res.status(400).json({message: "Nama Tournament telah digunakan"});
-      }
-      else {
-        Tournament.find({$and: [{ districts: district._id }, { game: game }]})
-        .then((game) => {
-          if (game.length == 0) {
-            if (permalink) {
-              res.status(400).json({message: "Permalink telah digunakan"});
-              return;
-            }else{
-              tournament.save().then((result) => {
-                res.status(200).json({ message: "berhasil" });
-              });
-            }
-          } else {
-            res.status(400).json({ message: "Sudah ada" });
-          }
+        else {
+          res.status(500).json({ message: "error" });
+        }
+      } else if(games.length == 0){
+        tournament.save().then((result) => {
+          res.status(200).json({ message: "berhasil" });
         });
+      } else {
+        res.status(500).json({ message: "error" });
       }
-    });
+    } else {
+      res.status(500).json({ message: "error" });
+    }
   }
 
   static getGameCategory(req, res, next) {
     let gameCategory;
-    Tournament.findOne({ id_user_panitia: req.userId }).then((user) => {
+    Tournament.findOne({
+      id_user_panitia: req.userId
+    }).then((user) => {
       gameCategory = user.game;
-      Game.findOne({ game_name: gameCategory })
+      Game.findOne({
+          game_name: gameCategory
+        })
         .then((game) => {
           res.status(200).json({
             message: "bisa",
@@ -168,35 +209,53 @@ class panitiaController {
   }
 
   static findTournamentBasedOnGame(req, res, next) {
-    const { game } = req.params;
-    Tournament.find({ game })
+    const {
+      game
+    } = req.params;
+    Tournament.find({
+        game
+      })
       .then((game) => {
         if (game.length == 0) {
-          res.status(400).json({ message: "Game not Found!" });
+          res.status(400).json({
+            message: "Game not Found!"
+          });
         } else {
-          res.status(200).json({ message: "Game Found!", game: game });
+          res.status(200).json({
+            message: "Game Found!",
+            game: game
+          });
         }
       })
       .catch(next);
   }
 
   static findTournamentBasedOnId(req, res, next) {
-    const { tournamentId } = req.params;
+    const {
+      tournamentId
+    } = req.params;
     Tournament.findById(tournamentId)
       .then((tournament) => {
         if (tournament.length == 0) {
-          res.status(400).json({ message: "Game not Found!" });
+          res.status(400).json({
+            message: "Game not Found!"
+          });
         } else {
           res
             .status(200)
-            .json({ message: "Game Found!", tournament: tournament });
+            .json({
+              message: "Game Found!",
+              tournament: tournament
+            });
         }
       })
       .catch(next);
   }
 
   static updateTournament(req, res, next) {
-    const { tournamentId } = req.params;
+    const {
+      tournamentId
+    } = req.params;
     const {
       max_total_participant,
       age_minimum,
@@ -227,22 +286,31 @@ class panitiaController {
       }
     }
 
-    Tournament.findByIdAndUpdate(tournamentId, updatedData, { new: true })
+    Tournament.findByIdAndUpdate(tournamentId, updatedData, {
+        new: true
+      })
       .then((tournament) => {
         res
           .status(200)
-          .json({ message: "Berhasil mengupdate tournament", tournament });
+          .json({
+            message: "Berhasil mengupdate tournament",
+            tournament
+          });
       })
       .catch(next);
   }
 
   static changeTournamentStatusOngoing(req, res, next) {
-    const { tournamentId } = req.params;
+    const {
+      tournamentId
+    } = req.params;
     Tournament.findByIdAndUpdate(
-      tournamentId,
-      { is_started: "ongoing" },
-      { new: true }
-    )
+        tournamentId, {
+          is_started: "ongoing"
+        }, {
+          new: true
+        }
+      )
       .then(tournament => {
         // // if user not approved.. still can changes other tournament.
         // User.find({districts: tournament.districts.toString(), tournament_register: tournament.tournament_register, tournament_approved: null})
@@ -253,41 +321,59 @@ class panitiaController {
         //   user.save();
         // })
         // .catch(next);
-        res.status(200).json({ message: "Berhasil mengupdate status turnamen", tournament });
+        res.status(200).json({
+          message: "Berhasil mengupdate status turnamen",
+          tournament
+        });
       })
       .catch(next);
   }
 
   static changeTournamentStatusCompleted(req, res, next) {
-    const { tournamentId } = req.params;
+    const {
+      tournamentId
+    } = req.params;
     Tournament.findByIdAndUpdate(
-      tournamentId,
-      { is_started: "completed" },
-      { new: true }
-    )
+        tournamentId, {
+          is_started: "completed"
+        }, {
+          new: true
+        }
+      )
       .then((tournament) => {
         res
           .status(200)
-          .json({ message: "Berhasil mengupdate status turnamen", tournament });
+          .json({
+            message: "Berhasil mengupdate status turnamen",
+            tournament
+          });
       })
       .catch(next);
   }
 
   static changeToApproved(req, res, next) {
-    const { userId } = req.params;
+    const {
+      userId
+    } = req.params;
     User.findById(userId)
       .populate("tournament_approved")
       .then((user) => {
         if (user.teams == null) {
-          res.status(400).json({ message: "user belum terdapat dalam Team!" });
+          res.status(400).json({
+            message: "user belum terdapat dalam Team!"
+          });
         } else if (user.tournament_register == null) {
           res
             .status(400)
-            .json({ message: "user belum melakukan registrasi tournament!" });
+            .json({
+              message: "user belum melakukan registrasi tournament!"
+            });
         } else {
           user.tournament_approved = user.tournament_register;
           user.save();
-          User.find({ teams: user.teams })
+          User.find({
+              teams: user.teams
+            })
             .then((member) => {
               for (let i = 0; i < member.length; i++) {
                 member[i].tournament_approved = user.tournament_register;
@@ -312,12 +398,16 @@ class panitiaController {
   }
 
   static getTheMatch(req, res, next) {
-    Match.find({ tournament: req.params.tournamentId })
+    Match.find({
+        tournament: req.params.tournamentId
+      })
       .populate("tournament")
       .populate("team")
       .then((match) => {
         if (match.length == 0) {
-          res.status(400).json({ message: "Nobody registered!" });
+          res.status(400).json({
+            message: "Nobody registered!"
+          });
         } else {
           res.status(200).json({
             match,
@@ -328,14 +418,16 @@ class panitiaController {
 
   static getTheTeamMatch(req, res, next) {
     Match.find({
-      tournament: req.params.tournamentId,
-      match_round: req.params.matchRound,
-    })
+        tournament: req.params.tournamentId,
+        match_round: req.params.matchRound,
+      })
       .populate("tournament")
       .populate("team")
       .then((match) => {
         if (match.length == 0) {
-          res.status(400).json({ message: "Nobody registered!" });
+          res.status(400).json({
+            message: "Nobody registered!"
+          });
         } else {
           res.status(200).json({
             match,
@@ -345,44 +437,67 @@ class panitiaController {
   }
 
   static inputScoreMatch(req, res, next) {
-    const { team, score, match_round } = req.body;
-    Match.findOne({ team: team, match_round: match_round })
+    const {
+      team,
+      score,
+      match_round
+    } = req.body;
+    Match.findOne({
+        team: team,
+        match_round: match_round
+      })
       .populate("tournament")
       .populate("team")
       .then((user) => {
         if (user.score == null) {
-          res.status(400).json({ message: "input user score!" });
+          res.status(400).json({
+            message: "input user score!"
+          });
         } else {
           user.score = score;
           user.save();
-          res.status(200).json({ message: "Score updated!" });
+          res.status(200).json({
+            message: "Score updated!"
+          });
         }
       })
       .catch(next);
   }
 
   static changeStatusEliminateTeam(req, res, next) {
-    const { team } = req.body;
-    Match.findOne({ team: team })
+    const {
+      team
+    } = req.body;
+    Match.findOne({
+        team: team
+      })
       .populate("tournament")
       .populate("team")
       .then((user) => {
         if (user.isEliminate == 0) {
           user.isEliminate = 1;
           user.save();
-          res.status(200).json({ message: "status eliminated True!" });
+          res.status(200).json({
+            message: "status eliminated True!"
+          });
         } else {
           user.isEliminate = 0;
           user.save();
-          res.status(200).json({ message: "status eliminated False!" });
+          res.status(200).json({
+            message: "status eliminated False!"
+          });
         }
       })
       .catch(next);
   }
 
   static checkThirdWinnerMatch(req, res, next) {
-    const { tournamentId } = req.params;
-    const { match_round } = req.body;
+    const {
+      tournamentId
+    } = req.params;
+    const {
+      match_round
+    } = req.body;
     Match.find({
       tournament: tournamentId,
       match_round: match_round - 1,
@@ -401,12 +516,21 @@ class panitiaController {
   }
 
   static checkEliminate(req, res, next) {
-    const { tournamentId } = req.params;
-    const { match_round } = req.body;
-    Match.find({ tournament: tournamentId, match_round: match_round })
+    const {
+      tournamentId
+    } = req.params;
+    const {
+      match_round
+    } = req.body;
+    Match.find({
+        tournament: tournamentId,
+        match_round: match_round
+      })
       .then((match) => {
         if (match.length <= 2) {
-          res.status(204).json({ message: "this is the last Match" });
+          res.status(204).json({
+            message: "this is the last Match"
+          });
           return;
         } else {
           for (let i = 0; i <= match.length; i += 2) {
@@ -453,21 +577,30 @@ class panitiaController {
             tournament.save();
           })
           .catch(next);
-        res.status(200).json({ message: "eliminate updated" });
+        res.status(200).json({
+          message: "eliminate updated"
+        });
       })
       .catch(next);
   }
 
   static async tournamentAllDistrict(req, res, next) {
     console.log("coba");
-    const { page = 1, limit = 10, q = "" } = req.query;
+    const {
+      page = 1, limit = 10, q = ""
+    } = req.query;
     const url_local = "http://localhost:8080";
     try {
       const tournament = await Tournament.find({
-        tournament_name: { $regex: q, $options: "i" },
-        districts: req.userDistrict,
-      })
-        .sort({ tournament_name: 1 })
+          tournament_name: {
+            $regex: q,
+            $options: "i"
+          },
+          districts: req.userDistrict,
+        })
+        .sort({
+          tournament_name: 1
+        })
         .populate("districts")
         .limit(limit * 1)
         .skip((page - 1) * limit)
@@ -476,7 +609,10 @@ class panitiaController {
       const nextpage = parseInt(page) + parseInt("1");
       const previouspage = parseInt(page) - parseInt("1");
       const jumlahData = await Tournament.countDocuments({
-        tournament_name: { $regex: q, $options: "i" },
+        tournament_name: {
+          $regex: q,
+          $options: "i"
+        },
       });
       const jumlahPage = Math.ceil(jumlahData / limit);
       var npg, ppg;
@@ -509,15 +645,22 @@ class panitiaController {
 
   static async tournamentAllDistrictOngoing(req, res, next) {
     console.log("coba");
-    const { page = 1, limit = 10, q = "" } = req.query;
+    const {
+      page = 1, limit = 10, q = ""
+    } = req.query;
     const url_local = "http://localhost:8080";
     try {
       const tournament = await Tournament.find({
-        tournament_name: { $regex: q, $options: "i" },
-        districts: req.userDistrict,
-        is_started: "ongoing",
-      })
-        .sort({ tournament_name: 1 })
+          tournament_name: {
+            $regex: q,
+            $options: "i"
+          },
+          districts: req.userDistrict,
+          is_started: "ongoing",
+        })
+        .sort({
+          tournament_name: 1
+        })
         .populate("districts")
         .limit(limit * 1)
         .skip((page - 1) * limit)
@@ -526,7 +669,10 @@ class panitiaController {
       const nextpage = parseInt(page) + parseInt("1");
       const previouspage = parseInt(page) - parseInt("1");
       const jumlahData = await Tournament.countDocuments({
-        tournament_name: { $regex: q, $options: "i" },
+        tournament_name: {
+          $regex: q,
+          $options: "i"
+        },
       });
       const jumlahPage = Math.ceil(jumlahData / limit);
       var npg, ppg;
@@ -558,30 +704,51 @@ class panitiaController {
   }
 
   static createWinners(req, res, next) {
-    const { tournamentId } = req.params;
-    const { first_winner, second_winner, third_winner } = req.body;
+    const {
+      tournamentId
+    } = req.params;
+    const {
+      first_winner,
+      second_winner,
+      third_winner
+    } = req.body;
 
     if (first_winner && second_winner && third_winner) {
-      Team.findOne({ team_name: { $in: first_winner } }).then((first) => {
+      Team.findOne({
+        team_name: {
+          $in: first_winner
+        }
+      }).then((first) => {
         Tournament.findByIdAndUpdate(tournamentId, {
           first_winner: first.team_name,
         }).then((first) => {
           console.log(first);
         });
       });
-      Team.findOne({ team_name: { $in: second_winner } }).then((second) => {
+      Team.findOne({
+        team_name: {
+          $in: second_winner
+        }
+      }).then((second) => {
         Tournament.findByIdAndUpdate(tournamentId, {
           second_winner: second.team_name,
         }).then((second) => {
           console.log(second);
         });
       });
-      Team.findOne({ team_name: { $in: third_winner } })
+      Team.findOne({
+          team_name: {
+            $in: third_winner
+          }
+        })
         .then((third) => {
           Tournament.findByIdAndUpdate(
-            tournamentId,
-            { third_winner: third.team_name },
-            { upsert: true, returnOriginal: false }
+            tournamentId, {
+              third_winner: third.team_name
+            }, {
+              upsert: true,
+              returnOriginal: false
+            }
           ).then((third) => {
             res.status(200).json({
               message: "Berhasil menambahkan pemenang perlombaan",
