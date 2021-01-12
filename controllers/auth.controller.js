@@ -53,37 +53,23 @@ class authController {
       ) {
         const retrySecs = Math.round(rlResUsername.msBeforeNext / 1000) || 1;
         res.set("Retry-After", String(retrySecs));
-        res.status(429).send("Too Many Requests");
+        res.status(429).json({message:"Maaf anda akan diblokir untuk sementara waktu"});
       } else {
         const user = await User.findOne({
           username: req.body.username,
         }).populate("districts");
-        if (user === null) {
-          try {
-            await limiterConsecutiveFailsByUsername.consume(username);
-            res.status(400).end("username or password is wrong");
-            return;
-          } catch (rlRejected) {
-            if (rlRejected instanceof Error) {
-              throw rlRejected;
-            } else {
-              res.set(
-                "Retry-After",
-                String(Math.round(rlRejected.msBeforeNext / 1000)) || 1
-              );
-              res.status(429).send("Too Many Requests");
-              return;
-            }
-          }
+        if (user === null || !user) {
+          res.status(400).json({message:"Nama pengguna atau kata sandi salah"});
         }
         var passwordIsValid = bcrypt.compareSync(
           req.body.password,
           user.password
         );
+
         if (!passwordIsValid) {
           try {
             await limiterConsecutiveFailsByUsername.consume(username);
-            res.status(400).end("username or password is wrong");
+            res.status(400).json({message:"Nama pengguna atau kata sandi salah"});
             return;
           } catch (rlRejected) {
             if (rlRejected instanceof Error) {
@@ -93,7 +79,7 @@ class authController {
                 "Retry-After",
                 String(Math.round(rlRejected.msBeforeNext / 1000)) || 1
               );
-              res.status(429).send("Too Many Requests");
+              res.status(429).json({message :"Maaf anda akan diblokir untuk sementara waktu"});
               return;
             }
           }
