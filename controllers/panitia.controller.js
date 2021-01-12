@@ -3,13 +3,6 @@ const Tournament = require("../models/Tournament.model");
 const Team = require("../models/Team.model");
 const Game = require("../models/Game.model");
 const Match = require("../models/Match.model");
-const bcrypt = require("bcrypt");
-const {
-  result
-} = require("lodash");
-const {
-  response
-} = require("express");
 
 class panitiaController {
   static updatePanitia(req, res, next) {
@@ -83,18 +76,10 @@ class panitiaController {
   }
 
   static async createGame(req, res, next) {
-    const {
-      game_name
-    } = req.body;
-    console.log(game_name);
-    const games = await Game.findOne({
-      game_name: req.body.game_name
-    })
-    if (games) {
-      if (games.game_name) {
-        res.status(400).send({
-          message: 'Game sudah dibuat'
-        })
+    const games = await Game.findOne({game_name: req.body.game_name})
+    if (games){
+      if (games.game_name){
+        res.status(400).send({message:'Game sudah dibuat'})
         return
       }
       if (games.game_name == null) {
@@ -103,17 +88,10 @@ class panitiaController {
         })
         return
       }
-    } else if (!games) {
-      Game.create({
-          game_name: req.body.game_name
-        })
+    } else if(!games) {
+      Game.create({game_name: req.body.game_name})
         .then((game) => {
-          res
-            .status(201)
-            .json({
-              message: "game berhasil ditambahkan",
-              game
-            });
+          res.status(201).json({message: "game berhasil ditambahkan",game});
         })
         .catch(next)
     } else {
